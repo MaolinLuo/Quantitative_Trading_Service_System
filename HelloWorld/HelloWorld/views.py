@@ -3,18 +3,19 @@ from django.shortcuts import render
 import pymysql
 from django.views.decorators.csrf import csrf_exempt
 
-db = pymysql.connect(host='120.46.152.35',
+# 120.46.205.232  Quantitative_Trading_Service_System
+db = pymysql.connect(host='120.46.205.232',
                      user='root',
                      password='123456',
-                     database='Quantitative_Trading_Service_System')
+                     database='quantitative_trading_service_system')
 cursor = db.cursor()
 
 
 # from HelloWorld.TestModel.models import stocks_basicinfo
 
-# def hello(request):
-#     return HttpResponse("Hello world!")
-#
+def hello(request):
+    return HttpResponse("Hello world!")
+
 # def runoob(request):
 #   views_dict = {"name":"菜鸟教程"}
 #   return  render(request,"runoob.html", {"views_dict":views_dict})
