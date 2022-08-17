@@ -3,10 +3,10 @@ from django.shortcuts import render
 import pymysql
 from django.views.decorators.csrf import csrf_exempt
 
-db = pymysql.connect(host='localhost',
+db = pymysql.connect(host='120.46.152.35',
                      user='root',
                      password='123456',
-                     database='quantitative_trading_service_system')
+                     database='Quantitative_Trading_Service_System')
 cursor = db.cursor()
 
 
