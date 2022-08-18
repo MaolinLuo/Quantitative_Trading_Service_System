@@ -40,6 +40,7 @@ def register(request):
     if results:
         return HttpResponse("222") # 用户名已存在
     else:
-        sql='INSERT INTO user (username,password,isAdmin) VALUES (?,?,?)'
-        cursor.execute(sql,(name,password,0))
+        sql='INSERT INTO user (username,password,isAdmin) VALUES (%s,%s,0)'
+        cursor.execute(sql,(name,password))
+        db.commit()
         return HttpResponse("111") # 注册成功
