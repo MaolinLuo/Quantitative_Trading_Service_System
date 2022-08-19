@@ -4,11 +4,11 @@ from django.http import HttpResponse
 import pymysql
 from django.views.decorators.csrf import csrf_exempt
 
-# 120.46.205.232  Quantitative_Trading_Service_System
+# 120.46.205.232  Quantitative_Trading_Service_System quantitative_trading_service_system
 db = pymysql.connect(host='localhost',
                      user='root',
-                     password='505505',
-                     database='test')
+                     password='123456',
+                     database='quantitative_trading_service_system')
 cursor = db.cursor()
 
 def hello(request):
