@@ -35,5 +35,5 @@ def UDdistribution(request):
         elif float(row[1]) >=8:
             record[9] = record[9] + 1
     jsonArr = json.dumps(record, ensure_ascii=False)
-    return HttpResponse(jsonArr) # 登录成功
+    return HttpResponse(jsonArr) # 涨跌分布拉取成功
 
