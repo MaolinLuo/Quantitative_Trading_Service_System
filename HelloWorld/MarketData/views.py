@@ -37,3 +37,13 @@ def UDdistribution(request):
     jsonArr = json.dumps(record, ensure_ascii=False)
     return HttpResponse(jsonArr) # 涨跌分布拉取成功
 
+@csrf_exempt
+def StockIndex(request):
+    marketlist = ['深证成指', '上证指数','创业板指']
+    stock_index = ak.stock_zh_index_spot()
+    stock_index = stock_index.loc[stock_index['名称'].isin(marketlist)]
+    stock_index = stock_index.loc[:, ['最新价','涨跌额','涨跌幅']]
+    stock_index.columns = ['latest price', 'change amount', 'change']
+    js = stock_index.to_json(orient = 'index')
+    return HttpResponse(js) # 股票指数拉取成功
+
