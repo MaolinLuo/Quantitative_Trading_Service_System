@@ -1,5 +1,6 @@
 import pymysql
 from django.http import HttpResponse
+import json
 
 db = pymysql.connect(host='localhost',
                      user='root',
@@ -16,6 +17,6 @@ def list(request):
     results = cursor.fetchall()
     res=[]
     for item in results:
-        print(item)
-
-    return HttpResponse("Hello world!")
+        tmp={'num':item[0],'title':item[1],'text':item[2],'tag1':item[3],'tag2':item[4],'tag3':item[5]}
+        res.append(tmp)
+    return HttpResponse(json.dumps(res))
