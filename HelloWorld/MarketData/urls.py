@@ -3,5 +3,6 @@ from django.urls import path,include
 from . import views
 
 urlpatterns = [
-    path('', views.UDdistribution),
+    path('UDdistribution/', views.UDdistribution),
+    path('StockIndex/', views.StockIndex),
 ]

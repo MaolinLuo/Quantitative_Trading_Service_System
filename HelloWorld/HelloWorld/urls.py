@@ -8,5 +8,5 @@ urlpatterns = [
     path('register/', views.register),
     path("stock/", include("Stock.urls")),
     path("strategy/", include("Strategy.urls")),
-    path("UDdistribution/", include("MarketData.urls")),
+    path("MarketData/", include("MarketData.urls")),
 ]
