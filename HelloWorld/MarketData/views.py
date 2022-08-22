@@ -1,6 +1,11 @@
 from django.http import HttpResponse
 import json
 import akshare as ak
+<<<<<<< HEAD
+=======
+import pandas as pd
+import datetime
+>>>>>>> 9ec9cf70528e9b9ace8f5bc7da132f02334b4c18
 
 
 def UDdistribution(request):
@@ -45,5 +50,17 @@ def MostPopular(request):
     df = stock_hot_follow_xq_df.head(10)
     return HttpResponse(df.to_json()) # 关注度拉取成功
 
-
-
+@csrf_exempt
+def HistoryStockIndex(request):
+    ISOTIMEFORMAT = '%Y%m%d'
+    date_now = datetime.datetime.now().strftime(ISOTIMEFORMAT)
+    index_zh_a_hist_df_sh = ak.index_zh_a_hist(symbol="000001", period="daily", start_date="20220101", end_date=date_now)
+    index_zh_a_hist_df_sz = ak.index_zh_a_hist(symbol="399001", period="daily", start_date="20220101", end_date=date_now)
+    index_zh_a_hist_df_cy = ak.index_zh_a_hist(symbol="399006", period="daily", start_date="20220101", end_date=date_now)
+    index_zh_a_hist_df_sh = index_zh_a_hist_df_sh.drop(['开盘', '最高', '最低', '成交量', '成交额', '振幅', '涨跌幅', '涨跌额', '换手率'], axis=1)
+    index_zh_a_hist_df_sz = index_zh_a_hist_df_sz.drop(['日期', '开盘', '最高', '最低', '成交量', '成交额', '振幅', '涨跌幅', '涨跌额', '换手率'], axis=1)
+    index_zh_a_hist_df_cy = index_zh_a_hist_df_cy.drop(['日期', '开盘', '最高', '最低', '成交量', '成交额', '振幅', '涨跌幅', '涨跌额', '换手率'], axis=1)
+    result = pd.concat([index_zh_a_hist_df_sh,index_zh_a_hist_df_sz,index_zh_a_hist_df_cy], axis=1)
+    result.columns = ['日期','上证指数', '深证指数','创业板指']
+    js = result.to_json(orient = 'index', force_ascii=False)
+    return HttpResponse(json.dumps(js,ensure_ascii=False)) # 历史股票指数拉取成功

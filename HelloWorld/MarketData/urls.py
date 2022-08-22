@@ -6,4 +6,5 @@ urlpatterns = [
     path('UDdistribution/', views.UDdistribution),
     path('StockIndex/', views.StockIndex),
     path('MostPopular/', views.MostPopular),
+    path('HistoryStockIndex/', views.HistoryStockIndex),
 ]
