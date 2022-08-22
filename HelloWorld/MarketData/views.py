@@ -45,7 +45,6 @@ def StockIndex(request):
     stock_index = stock_index.loc[stock_index['名称'].isin(marketlist)]
     stock_index = stock_index.loc[:, ['最新价','涨跌额','涨跌幅']]
     stock_index.columns = ['latest_price', 'change_amount', 'change']
-    stock_index.iloc[2, 2] = -55.55
     js = stock_index.to_json(orient = 'index')
     return HttpResponse(js) # 股票指数拉取成功
 
