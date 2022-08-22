@@ -1,11 +1,8 @@
 from django.http import HttpResponse
 import json
 import akshare as ak
-<<<<<<< HEAD
-=======
 import pandas as pd
 import datetime
->>>>>>> 9ec9cf70528e9b9ace8f5bc7da132f02334b4c18
 
 
 def UDdistribution(request):
@@ -50,7 +47,6 @@ def MostPopular(request):
     df = stock_hot_follow_xq_df.head(10)
     return HttpResponse(df.to_json()) # 关注度拉取成功
 
-@csrf_exempt
 def HistoryStockIndex(request):
     ISOTIMEFORMAT = '%Y%m%d'
     date_now = datetime.datetime.now().strftime(ISOTIMEFORMAT)
