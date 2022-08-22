@@ -9,4 +9,5 @@ urlpatterns = [
     path("stock/", include("Stock.urls")),
     path("strategy/", include("Strategy.urls")),
     path("MarketData/", include("MarketData.urls")),
+    path("news/",include("News.urls"))
 ]

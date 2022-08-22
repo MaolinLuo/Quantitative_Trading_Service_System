@@ -1,14 +1,8 @@
-from django.shortcuts import render
-
-# Create your views here.
 from django.http import HttpResponse
 import json
-import pymysql
-from django.views.decorators.csrf import csrf_exempt
 import akshare as ak
-import pandas as pd
 
-@csrf_exempt
+
 def UDdistribution(request):
     stock_zh_a_spot_em_df = ak.stock_zh_a_spot_em()
     record = [0,0,0,0,0,0,0,0,0,0]
@@ -37,22 +31,19 @@ def UDdistribution(request):
     jsonArr = json.dumps(record, ensure_ascii=False)
     return HttpResponse(jsonArr) # 涨跌分布拉取成功
 
-@csrf_exempt
 def StockIndex(request):
     marketlist = ['深证成指', '上证指数','创业板指']
     stock_index = ak.stock_zh_index_spot()
     stock_index = stock_index.loc[stock_index['名称'].isin(marketlist)]
     stock_index = stock_index.loc[:, ['最新价','涨跌额','涨跌幅']]
-    stock_index.columns = ['latest price', 'change amount', 'change']
+    stock_index.columns = ['latest_price', 'change_amount', 'change']
     js = stock_index.to_json(orient = 'index')
     return HttpResponse(js) # 股票指数拉取成功
 
-@csrf_exempt
 def MostPopular(request):
     stock_hot_follow_xq_df = ak.stock_hot_follow_xq(symbol="最热门")
-    stock_hot_follow_xq_df = stock_hot_follow_xq_df.head(10)
-    js = stock_hot_follow_xq_df.to_json(orient = 'index', force_ascii=False)
-    return HttpResponse(json.dumps(js,ensure_ascii=False)) # 关注度拉取成功
+    df = stock_hot_follow_xq_df.head(10)
+    return HttpResponse(df.to_json()) # 关注度拉取成功
 
 
 
