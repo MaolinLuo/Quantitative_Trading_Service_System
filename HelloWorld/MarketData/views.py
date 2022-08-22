@@ -7,6 +7,7 @@ import pymysql
 from django.views.decorators.csrf import csrf_exempt
 import akshare as ak
 import pandas as pd
+import datetime
 
 @csrf_exempt
 def UDdistribution(request):
@@ -43,7 +44,8 @@ def StockIndex(request):
     stock_index = ak.stock_zh_index_spot()
     stock_index = stock_index.loc[stock_index['名称'].isin(marketlist)]
     stock_index = stock_index.loc[:, ['最新价','涨跌额','涨跌幅']]
-    stock_index.columns = ['latest price', 'change amount', 'change']
+    stock_index.columns = ['latest_price', 'change_amount', 'change']
+    stock_index.iloc[2, 2] = -55.55
     js = stock_index.to_json(orient = 'index')
     return HttpResponse(js) # 股票指数拉取成功
 
@@ -54,5 +56,17 @@ def MostPopular(request):
     js = stock_hot_follow_xq_df.to_json(orient = 'index', force_ascii=False)
     return HttpResponse(json.dumps(js,ensure_ascii=False)) # 关注度拉取成功
 
-
-
+@csrf_exempt
+def HistoryStockIndex(request):
+    ISOTIMEFORMAT = '%Y%m%d'
+    date_now = datetime.datetime.now().strftime(ISOTIMEFORMAT)
+    index_zh_a_hist_df_sh = ak.index_zh_a_hist(symbol="000001", period="daily", start_date="20220101", end_date=date_now)
+    index_zh_a_hist_df_sz = ak.index_zh_a_hist(symbol="399001", period="daily", start_date="20220101", end_date=date_now)
+    index_zh_a_hist_df_cy = ak.index_zh_a_hist(symbol="399006", period="daily", start_date="20220101", end_date=date_now)
+    index_zh_a_hist_df_sh = index_zh_a_hist_df_sh.drop(['开盘', '最高', '最低', '成交量', '成交额', '振幅', '涨跌幅', '涨跌额', '换手率'], axis=1)
+    index_zh_a_hist_df_sz = index_zh_a_hist_df_sz.drop(['日期', '开盘', '最高', '最低', '成交量', '成交额', '振幅', '涨跌幅', '涨跌额', '换手率'], axis=1)
+    index_zh_a_hist_df_cy = index_zh_a_hist_df_cy.drop(['日期', '开盘', '最高', '最低', '成交量', '成交额', '振幅', '涨跌幅', '涨跌额', '换手率'], axis=1)
+    result = pd.concat([index_zh_a_hist_df_sh,index_zh_a_hist_df_sz,index_zh_a_hist_df_cy], axis=1)
+    result.columns = ['日期','上证指数', '深证指数','创业板指']
+    js = result.to_json(orient = 'index', force_ascii=False)
+    return HttpResponse(json.dumps(js,ensure_ascii=False)) # 历史股票指数拉取成功
