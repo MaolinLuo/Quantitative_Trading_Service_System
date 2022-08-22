@@ -47,3 +47,12 @@ def StockIndex(request):
     js = stock_index.to_json(orient = 'index')
     return HttpResponse(js) # 股票指数拉取成功
 
+@csrf_exempt
+def MostPopular(request):
+    stock_hot_follow_xq_df = ak.stock_hot_follow_xq(symbol="最热门")
+    stock_hot_follow_xq_df = stock_hot_follow_xq_df.head(10)
+    js = stock_hot_follow_xq_df.to_json(orient = 'index', force_ascii=False)
+    return HttpResponse(json.dumps(js,ensure_ascii=False)) # 关注度拉取成功
+
+
+
