@@ -113,5 +113,5 @@ def companyinfo(request):
         code = request.GET.get("code")
     q = query(finance.STK_COMPANY_INFO).filter(finance.STK_COMPANY_INFO.code == normalize_code(code)).limit(10)
     df = finance.run_query(q)
-    print(df)
+    # print(df)
     return HttpResponse(df.to_json(orient='records'))
