@@ -57,6 +57,6 @@ def HistoryStockIndex(request):
     index_zh_a_hist_df_sz = index_zh_a_hist_df_sz.drop(['日期', '开盘', '最高', '最低', '成交量', '成交额', '振幅', '涨跌幅', '涨跌额', '换手率'], axis=1)
     index_zh_a_hist_df_cy = index_zh_a_hist_df_cy.drop(['日期', '开盘', '最高', '最低', '成交量', '成交额', '振幅', '涨跌幅', '涨跌额', '换手率'], axis=1)
     result = pd.concat([index_zh_a_hist_df_sh,index_zh_a_hist_df_sz,index_zh_a_hist_df_cy], axis=1)
-    result.columns = ['日期','上证指数', '深证指数','创业板指']
-    js = result.to_json(orient = 'index', force_ascii=False)
+    result.columns = ['Date','sh', 'sz','cy']
+    js = result.to_json(force_ascii=False)
     return HttpResponse(json.dumps(js,ensure_ascii=False)) # 历史股票指数拉取成功
