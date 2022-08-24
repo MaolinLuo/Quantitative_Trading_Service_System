@@ -1,3 +1,5 @@
+import multiprocessing
+
 from utils.util import *
 class SmaAverages(bt.Strategy):
     params = (
@@ -112,6 +114,7 @@ class SmaAverages(bt.Strategy):
 
      # 每轮买卖结束后，看持仓的股票,essential
      for data in self.datas:
+
          pos = self.getposition(data)
 
          if len(pos):
@@ -151,4 +154,13 @@ def run_sma(ts_code_list):
     value_ratio = []
     value_ratio=calculate_date_profit(value_ratio,date_value_list)#计算每天的策略收益
     print(value_ratio)
-run_sma(["000001.SZ","000002.SZ","000004.SZ", " 000005.SZ"])
+if __name__ == '__main__':
+    p1 = multiprocessing.Process(target=run_sma(["000001.SZ","000002.SZ","000004.SZ", " 000005.SZ"]))
+    p2 = multiprocessing.Process(target=run_sma(["000001.SZ", "000002.SZ", "000004.SZ", " 000005.SZ"]))
+
+    # 启动子进程
+    p1.start()
+    p2.start()
+
+
+
