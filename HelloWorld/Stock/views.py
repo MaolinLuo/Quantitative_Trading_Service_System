@@ -47,23 +47,26 @@ def allStocks(request):
         pagenum = request.GET.get("pagenum")
     # 调用akshare的数据
     stock_zh_a_spot_em_df = ak.stock_zh_a_spot_em()
-    df = stock_zh_a_spot_em_df.loc[:, '序号':'成交量']
-    df.columns = ['num', 'code', 'name', 'price', 'range', 'amount', 'vol']
+    df = stock_zh_a_spot_em_df.loc[:, '序号':'换手率']
     if pagenum == "102":
         df = df[(int(pagenum) - 1) * 50:5092]
     else:
         df = df[(int(pagenum) - 1) * 50:(int(pagenum) - 1) * 50 + 50]
-    res = []
-    i = 0
-    while i != len(df):
-        tmp = {"number": str(df.iat[i, 0]), "code": str(df.iat[i, 1]), "stock_name": df.iat[i, 2],
-               "present_price": str(df.iat[i, 3]),
-               "change_percent": str(df.iat[i, 4]), "change_volume": str(df.iat[i, 5]),
-               "trade_volume": str(df.iat[i, 6])}
-        res.append(tmp)
-        i += 1
-    return HttpResponse(json.dumps(res))
-    # return HttpResponse(df.to_json())
+    df.columns = ['number', 'code', 'stock_name', 'present_price', 'change_percent', 'change_volume', 'trade_volume',
+                  'trade_price', 'violate', 'high', 'low', 'today_open', 'yesterday_close', 'rate', 'change_rate']
+    df['trade_volume']=df['trade_volume'].apply(str_of_num)
+    df['trade_price']=df['trade_price'].apply(str_of_num)
+    # res = []
+    # i = 0
+    # while i != len(df):
+    #     tmp = {"number": str(df.iat[i, 0]), "code": str(df.iat[i, 1]), "stock_name": df.iat[i, 2],
+    #            "present_price": str(df.iat[i, 3]),
+    #            "change_percent": str(df.iat[i, 4]), "change_volume": str(df.iat[i, 5]),
+    #            "trade_volume": str(df.iat[i, 6])}
+    #     res.append(tmp)
+    #     i += 1
+    # return HttpResponse(json.dumps(res))
+    return HttpResponse(df.to_json(orient='records'))
 
 def realTableData(request):
     if request.headers['Content-Type'] == "application/json;charset=UTF-8":

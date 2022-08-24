@@ -5,4 +5,5 @@ from . import views
 urlpatterns = [
     path('', views.collection),
     path('list/', views.list),
+    path('removeColl/', views.removeColl),
 ]
