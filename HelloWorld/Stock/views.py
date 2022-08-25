@@ -3,6 +3,7 @@ from dateutil.relativedelta import relativedelta
 from django.http import HttpResponse
 import datetime
 import akshare as ak
+from jqdatasdk import get_security_info, normalize_code
 from jqdatasdk import *
 
 auth('13383909875', '13383909875Zc')
