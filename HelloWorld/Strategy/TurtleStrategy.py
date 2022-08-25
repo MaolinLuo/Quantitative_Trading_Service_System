@@ -1,4 +1,3 @@
-from datetime import datetime
 import backtrader as bt
 from . import util
 import pandas as pd
@@ -95,7 +94,7 @@ class TurtleStrategy(bt.Strategy):
             self.order = self.buy()
             temp = util.return_trade_dict(data, "buy", self.sizer.p.stake)
 
-            trade_result = pd.concat([temp, trade_result])
+            util.trade_result = pd.concat([temp, util.trade_result])
             # 加仓：价格上涨了买入价的0.5的ATR且加仓次数少于3次（含）
          elif data.close > self.buyprice + 0.5 * self.ATR[data._name][0] and self.buy_count > 0 and self.buy_count <=4:
             print("buy2")
@@ -106,7 +105,7 @@ class TurtleStrategy(bt.Strategy):
             self.buy_count += 1
             temp = util.return_trade_dict(data, "buy", self.sizer.p.stake)
 
-            trade_result = pd.concat([temp, trade_result])
+            util.trade_result = pd.concat([temp, util.trade_result])
             # 离场：价格跌破下轨线且持仓时
          elif self.sell_signal[data._name] < 0 and self.buy_count > 0:
             print("sell1")
@@ -114,7 +113,7 @@ class TurtleStrategy(bt.Strategy):
             self.buy_count = 0
             temp = util.return_trade_dict(data, "sell", self.sizer.p.stake)
 
-            trade_result = pd.concat([temp, trade_result])
+            util.trade_result = pd.concat([temp, util.trade_result])
             # 止损：价格跌破买入价的2个ATR且持仓时
          elif data.close < (self.buyprice - 2 * self.ATR[data._name][0]) and self.buy_count > 0:
             print("sell2")
@@ -122,7 +121,7 @@ class TurtleStrategy(bt.Strategy):
             self.buy_count = 0
             temp = util.return_trade_dict(data, "sell", self.sizer.p.stake)
 
-            trade_result = pd.concat([temp, trade_result])
+            util.trade_result = pd.concat([temp, util.trade_result])
 
         for data in self.datas:
             pos = self.getposition(data)
@@ -130,9 +129,9 @@ class TurtleStrategy(bt.Strategy):
             if len(pos):
                 # 存持仓列表
                 temp = util.return_hold_dict(pos, data)
-                hold_result = pd.concat([temp, hold_result])
+                util.hold_result = pd.concat([temp, util.hold_result])
             # 保存每天的账户价值,essential
-        date_value_list.append((self.data.datetime.date(0), self.broker.getvalue()))
+        util.date_value_list.append((self.data.datetime.date(0), self.broker.getvalue()))
 
     def log(self, txt, dt=None):
         dt = dt or self.data.datetime.date(0)
@@ -149,7 +148,7 @@ def run_turtle(ts_code_list,startdate,enddate):
     end_day = int(enddate[6:8])
     for ts_code in ts_code_list:
         stock = util.getdata(ts_code)
-        data = util.btfeeds.PandasData(dataname=stock, fromdate=datetime.date(start_year, start_month, start_day), todate=datetime.date(end_year, end_month, end_day))
+        data = util.btfeeds.PandasData(dataname=stock, fromdate=util.datetime.date(start_year, start_month, start_day), todate=util.datetime.date(end_year, end_month, end_day))
         cerebro.adddata(data, name=ts_code)
     cerebro.broker.setcash(1000000)
     cerebro.broker.setcommission(commission=0.001)
@@ -160,8 +159,8 @@ def run_turtle(ts_code_list,startdate,enddate):
     indicator_list = util.return_indicators_list(strat, indicator_list)
 
     value_ratio = []
-    value_ratio = util.calculate_date_profit(value_ratio, date_value_list)  # 计算每天的策略收益
+    value_ratio = util.calculate_date_profit(value_ratio, util.date_value_list)  # 计算每天的策略收益
 
-    return hold_result.sort_values('date'), trade_result.sort_values('date'), value_ratio, indicator_list
+    return util.hold_result.sort_values('date'), util.trade_result.sort_values('date'), value_ratio, indicator_list
 
 
