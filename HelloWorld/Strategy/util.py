@@ -43,9 +43,10 @@ def return_trade_dict(data,type,size):
     return temp
 def calculate_date_profit(value_ratio,list):
 
-    value_ratio.append(0.0)
+    value_ratio.append([list[0][0],0.0])
     for i in range(1, len(list)):
-        value_ratio.append((list[i][1] - list[0][1]) / list[0][1])
+        value_ratio.append([list[i][0],(list[i][1] - list[0][1]) / list[0][1]])
+    value_ratio=pd.DataFrame(value_ratio,columns=["date","ratio"])
     return value_ratio
 def add_custom_analyzer(cerebro):
     cerebro.addanalyzer(bt.analyzers.Returns, _name="returns")
