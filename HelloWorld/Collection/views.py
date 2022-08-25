@@ -1,12 +1,17 @@
 import json
 from django.http import HttpResponse
 import pymysql
+from jqdatasdk import *
+from itertools import chain
+import akshare as ak
+
+auth('13383909875', '13383909875Zc')
 
 # 120.46.205.232  Quantitative_Trading_Service_System quantitative_trading_service_system
 db = pymysql.connect(host='localhost',
                      user='root',
-                     password='505505',
-                     database='test')
+                     password='123456',
+                     database='quantitative_trading_service_system')
 cursor = db.cursor()
 
 # 增
@@ -51,7 +56,23 @@ def list(request):
     sql = 'SELECT * FROM collection_list WHERE username = %s'
     cursor.execute(sql, username)
     # results = cursor.fetchall()
+    # resultlist = list(chain.from_iterable(results))
     res = fetch_dict_result(cursor)
+    # print(resultlist)
+    ###########################
+    # ncode = normalize_code(code)  # 转成聚宽的代码
+    # try:
+    #     display_name = get_security_info(ncode).display_name
+    # except:
+    #     return HttpResponse(json.dumps({'code': '222'}))
+    # df = ak.stock_zh_a_spot_em()
+    # df = df.loc[df['代码'] == code]
+    # df = df.loc[:, ('最新价', '今开', '涨跌额', '最高', '涨跌幅', '名称')]
+    # res = []
+    # res.append({"最新价": df.iat[0, 0], "开盘价": df.iat[0, 1], "涨跌": df.iat[0, 2], "最高价": df.iat[0, 3],
+    #             "涨跌幅": str(df.iat[0, 4]) + '%', "名称": df.iat[0, 5]})
+    # return HttpResponse(json.dumps(res))
+    ###########################
     return HttpResponse(res)
 
 # 删
