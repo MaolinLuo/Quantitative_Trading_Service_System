@@ -191,9 +191,13 @@ def run_gru(ts_code,startdate,enddate):
 
      return util.hold_result.sort_values('date'), util.trade_result.sort_values('date'), value_ratio, indicator_list
 
-def run_gru_final(ts_code,test_start_date,test_end_date,epoch,_steps):
+def run_gru_final(ts_code,test_start_date,test_end_date,epoch,_steps,_rate,_stock_size):
     global steps
     steps = _steps
+    global rate
+    rate = _rate
+    global stock_size
+    stock_size = _stock_size
     evaluation.prepareModel(ts_code=ts_code, start_date='20150101', end_date=test_start_date, train_test_rate=0.95, epoch=epoch,
                  steps=steps)
     result = run_gru(ts_code, test_start_date, test_end_date)
