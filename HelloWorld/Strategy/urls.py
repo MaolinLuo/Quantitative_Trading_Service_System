@@ -7,4 +7,5 @@ urlpatterns = [
     path('list/', views.list),
     path('sma/', views.sma),
     path('turtle/', views.turtle),
+    path('gru/', views.gru),
 ]
