@@ -5,6 +5,8 @@ from django.views.decorators.csrf import csrf_exempt
 
 from . import SmaAverages
 from . import TurtleStrategy
+from . import KeltnerStrategy
+from . import BollStrategy
 from . import gruStrategy
 
 db = pymysql.connect(host='localhost',
@@ -44,12 +46,8 @@ def sma(request):
     hold_result = hold_result.to_json(orient = 'records')
     trade_result = trade_result.to_json(orient = 'records')
     value_ratio = value_ratio.to_json(orient = 'records')
-    res=[]
-    res.append(hold_result)
-    res.append(trade_result)
-    res.append(value_ratio)
-    res.append(indicator_list)
-    return HttpResponse(res)
+    
+    return HttpResponse(json.dumps({'hold_result':hold_result,'trade_result':trade_result,'value_ratio':value_ratio,'indicator_list':indicator_list})) 
 
 @csrf_exempt
 def turtle(request):
@@ -70,6 +68,49 @@ def turtle(request):
     value_ratio = value_ratio.to_json(orient = 'records')
     
     return HttpResponse(json.dumps({'hold_result':hold_result,'trade_result':trade_result,'value_ratio':value_ratio,'indicator_list':indicator_list})) 
+
+
+@csrf_exempt
+def keltner(request):
+    if request.headers['Content-Type']=="application/json;charset=UTF-8":
+        data=json.loads(request.body.decode('utf-8'))
+        stocks=data.get('stocks')
+        startDate=data.get('startDate')
+        endDate=data.get('endDate')
+    else:
+        stocks = request.POST.get("stocks")
+        startDate = request.POST.get("startDate")
+        endDate = request.POST.get("endDate")
+
+    stocks = stocks.split(",")
+    hold_result, trade_result, value_ratio, indicator_list = KeltnerStrategy.run_keltner(stocks, startDate, endDate)
+    hold_result = hold_result.to_json(orient = 'records')
+    trade_result = trade_result.to_json(orient = 'records')
+    value_ratio = value_ratio.to_json(orient = 'records')
+    
+    return HttpResponse(json.dumps({'hold_result':hold_result,'trade_result':trade_result,'value_ratio':value_ratio,'indicator_list':indicator_list})) 
+
+@csrf_exempt
+def boll(request):
+    if request.headers['Content-Type']=="application/json;charset=UTF-8":
+        data=json.loads(request.body.decode('utf-8'))
+        stocks=data.get('stocks')
+        startDate=data.get('startDate')
+        endDate=data.get('endDate')
+    else:
+        stocks = request.POST.get("stocks")
+        startDate = request.POST.get("startDate")
+        endDate = request.POST.get("endDate")
+
+    stocks = stocks.split(",")
+    hold_result, trade_result, value_ratio, indicator_list = BollStrategy.run_Boll(stocks, startDate, endDate)
+    hold_result = hold_result.to_json(orient = 'records')
+    trade_result = trade_result.to_json(orient = 'records')
+    value_ratio = value_ratio.to_json(orient = 'records')
+    
+    return HttpResponse(json.dumps({'hold_result':hold_result,'trade_result':trade_result,'value_ratio':value_ratio,'indicator_list':indicator_list})) 
+
+
 
 @csrf_exempt
 def gru(request):

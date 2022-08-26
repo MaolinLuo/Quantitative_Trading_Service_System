@@ -176,7 +176,7 @@ def run_gru(ts_code,startdate,enddate):
      cerebro.adddata(data)
 
      # 设置投资金额100000.0
-     cerebro.broker.setcash(100000.0)
+     cerebro.broker.setcash(1000000.0)
      # # 设置佣金为0.001,除以100去掉%号
      cerebro.broker.setcommission(commission=0.001)
 

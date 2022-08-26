@@ -8,4 +8,6 @@ urlpatterns = [
     path('sma/', views.sma),
     path('turtle/', views.turtle),
     path('gru/', views.gru),
+    path('keltner/', views.keltner),
+    path('boll/', views.boll),
 ]
