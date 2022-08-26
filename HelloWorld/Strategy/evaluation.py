@@ -106,7 +106,7 @@ def prepareModel(ts_code, start_date="20190101", end_date="20220811", train_test
     gru = train(gru, epoch, train_data, criterion, optimizer, device)
     torch.save(gru, './gru.pt')
     real_data, pred_data = evaluator(gru, test_data, device, steps=steps)
-    draw(real_data, pred_data)
+    # draw(real_data, pred_data)
 
 
 # if __name__ == '__main__':

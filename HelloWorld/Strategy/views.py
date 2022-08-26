@@ -24,7 +24,7 @@ def list(request):
     for item in results:
         tmp={'num':item[0],'title':item[1],'text':item[2],'tag1':item[3],'tag2':item[4],'tag3':item[5]}
         res.append(tmp)
-    db.close()
+    # db.close()
     return HttpResponse(json.dumps(res))
 
 @csrf_exempt
@@ -41,15 +41,29 @@ def sma(request):
 
     stocks = stocks.split(",")
     hold_result, trade_result, value_ratio, indicator_list = SmaAverages.run_sma(stocks, startDate, endDate)
-    hold_result = hold_result.to_json(orient = 'records')
-    trade_result = trade_result.to_json(orient = 'records')
-    value_ratio = value_ratio.to_json(orient = 'records')
-    res=[]
-    res.append(hold_result)
-    res.append(trade_result)
-    res.append(value_ratio)
-    res.append(indicator_list)
-    return HttpResponse(res)
+    hold_result = hold_result.to_json(orient = 'values')
+    trade_result = trade_result.to_json(orient = 'values')
+    value_ratio = value_ratio.to_json(orient = 'values')
+    # hold_result = hold_result.to_json(orient='values')
+    # trade_result = trade_result.to_json(orient='values')0
+    # value_ratio = value_ratio.to_json(orient='values')
+    # res={"hold_result":str(hold_result).replace('[','{').replace(']','}'),
+    #      "trade_result":str(trade_result).replace('[','{').replace(']','}'),
+    #      "value_ratio":str(value_ratio).replace('[','{').replace(']','}'),
+    #      "indicator_list":indicator_list
+    #     }
+    res = {"hold_result": hold_result,
+           "trade_result": trade_result,
+           "value_ratio": value_ratio,
+           "indicator_list": indicator_list
+           }
+    # res=[]
+    # res.append(hold_result)
+    # res.append(trade_result)
+    # res.append(value_ratio)
+    # res.append(indicator_list)
+    # print(res)
+    return HttpResponse(json.dumps(res))
 
 @csrf_exempt
 def turtle(request):

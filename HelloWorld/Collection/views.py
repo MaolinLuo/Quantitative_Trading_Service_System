@@ -57,29 +57,23 @@ def list(request):
     cursor.execute(sql, username)
     res = fetch_dict_result(cursor)
     js = json.loads(res)
+    db.commit()
     df = ak.stock_zh_a_spot_em()
     for item in js:
         tmp=df.loc[df['代码']==item['code']]
         tmp=tmp.loc[:,('最新价', '今开', '涨跌额', '最高', '涨跌幅')]
-        item['present_price']=tmp.iat[0,0]
-        item['open']=tmp.iat[0,0]
-        item['amount'] = tmp.iat[0,0]
-        item['high'] = tmp.iat[0,0]
-        item['range'] = tmp.iat[0,0]
-    ###########################
-    # ncode = normalize_code(code)  # 转成聚宽的代码
-    # try:
-    #     display_name = get_security_info(ncode).display_name
-    # except:
-    #     return HttpResponse(json.dumps({'code': '222'}))
-    # df = ak.stock_zh_a_spot_em()
-    # df = df.loc[df['代码'] == code]
-    # df = df.loc[:, ('最新价', '今开', '涨跌额', '最高', '涨跌幅', '名称')]
-    # res = []
-    # res.append({"最新价": df.iat[0, 0], "开盘价": df.iat[0, 1], "涨跌": df.iat[0, 2], "最高价": df.iat[0, 3],
-    #             "涨跌幅": str(df.iat[0, 4]) + '%', "名称": df.iat[0, 5]})
-    # return HttpResponse(json.dumps(res))
-    ###########################
+        if tmp.empty:
+            item['present_price'] = ''
+            item['open'] = ''
+            item['amount'] = ''
+            item['high'] = ''
+            item['range'] = ''
+        else:
+            item['present_price'] = tmp.iat[0, 0]
+            item['open'] = tmp.iat[0, 1]
+            item['amount'] = tmp.iat[0, 2]
+            item['high'] = tmp.iat[0, 3]
+            item['range'] = tmp.iat[0, 4]
     return HttpResponse(json.dumps(js))
 
 # 删
