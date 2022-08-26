@@ -55,10 +55,17 @@ def list(request):
         username = request.GET.get('username')
     sql = 'SELECT * FROM collection_list WHERE username = %s'
     cursor.execute(sql, username)
-    # results = cursor.fetchall()
-    # resultlist = list(chain.from_iterable(results))
     res = fetch_dict_result(cursor)
-    # print(resultlist)
+    js = json.loads(res)
+    df = ak.stock_zh_a_spot_em()
+    for item in js:
+        tmp=df.loc[df['代码']==item['code']]
+        tmp=tmp.loc[:,('最新价', '今开', '涨跌额', '最高', '涨跌幅')]
+        item['present_price']=tmp.iat[0,0]
+        item['open']=tmp.iat[0,0]
+        item['amount'] = tmp.iat[0,0]
+        item['high'] = tmp.iat[0,0]
+        item['range'] = tmp.iat[0,0]
     ###########################
     # ncode = normalize_code(code)  # 转成聚宽的代码
     # try:
@@ -73,7 +80,7 @@ def list(request):
     #             "涨跌幅": str(df.iat[0, 4]) + '%', "名称": df.iat[0, 5]})
     # return HttpResponse(json.dumps(res))
     ###########################
-    return HttpResponse(res)
+    return HttpResponse(json.dumps(js))
 
 # 删
 def removeColl(request):
