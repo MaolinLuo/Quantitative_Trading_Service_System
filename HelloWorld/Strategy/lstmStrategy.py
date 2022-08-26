@@ -7,7 +7,7 @@ import pandas as pd
 import backtrader as bt
 import backtrader.feeds as btfeeds
 import backtrader.indicators as btind
-from . import evaluationGRU
+from . import evaluationLSTM
 import torch
 from . import util
 
@@ -35,7 +35,7 @@ class DLStrategy(bt.Strategy):
 
     def __init__(self):
 
-        self.model = torch.load('./gru.pt')
+        self.model = torch.load('./lstm.pt')
         print('model loaded')
 
         # 用于保存订单
@@ -149,7 +149,7 @@ class DLStrategy(bt.Strategy):
 
 
 
-def run_gru(ts_code,startdate,enddate):
+def run_lstm(ts_code,startdate,enddate):
      # 创建Cerebro引擎
      cerebro = bt.Cerebro()
      # Cerebro引擎在后台创建broker(经纪人)，系统默认资金量为10000
@@ -191,18 +191,18 @@ def run_gru(ts_code,startdate,enddate):
 
      return util.hold_result.sort_values('date'), util.trade_result.sort_values('date'), value_ratio, benchmark, indicator_list
 
-def run_gru_final(ts_code,test_start_date,test_end_date,epoch,_steps,_rate,_stock_size):
+def run_lstm_final(ts_code,test_start_date,test_end_date,epoch,_steps,_rate,_stock_size):
     global steps
     steps = _steps
     global rate
     rate = _rate
     global stock_size
     stock_size = _stock_size
-    evaluationGRU.prepareModel(ts_code=ts_code, start_date='20150101', end_date=test_start_date, train_test_rate=0.95, epoch=epoch,
+    evaluationLSTM.prepareModel(ts_code=ts_code, start_date='20150101', end_date=test_start_date, train_test_rate=0.95, epoch=epoch,
                  steps=steps)
-    result = run_gru(ts_code, test_start_date, test_end_date)
+    result = run_lstm(ts_code, test_start_date, test_end_date)
     return result
 
 
 # if __name__ == '__main__':
-#     run_gru_final('002169.SZ', '20200101', '20220824',100,3)
+#     run_lstm_final('002169.SZ', '20200101', '20220824',100,3)

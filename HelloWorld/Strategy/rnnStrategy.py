@@ -146,7 +146,7 @@ class DLStrategy(bt.Strategy):
          temp = util.return_hold_dict(pos, self.datas[0])
          util.hold_result = pd.concat([temp, util.hold_result])
 
-        util.date_value_list.append((self.data.datetime.date(0), self.broker.getvalue()))
+
 
 
 def run_rnn(ts_code,startdate,enddate):
@@ -181,13 +181,13 @@ def run_rnn(ts_code,startdate,enddate):
      cerebro.broker.setcommission(commission=0.001)
 
      util.add_custom_analyzer(cerebro)
+     old_value=cerebro.broker.getvalue()
      result = cerebro.run()
      strat = result[0]
-     indicator_list = [cerebro.broker.getvalue()]
+     indicator_list = [cerebro.broker.getvalue(),(cerebro.broker.getvalue()-old_value)/old_value]
      indicator_list = util.return_indicators_list(strat, indicator_list)
 
-     value_ratio = []
-     value_ratio = util.calculate_date_profit(value_ratio, util.date_value_list)  # 计算每天的策略收益
+     value_ratio=util.return_value_ratio(strat)  # 计算每天的策略收益
 
      return util.hold_result.sort_values('date'), util.trade_result.sort_values('date'), value_ratio, benchmark, indicator_list
 

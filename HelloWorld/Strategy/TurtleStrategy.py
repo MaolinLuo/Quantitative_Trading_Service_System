@@ -130,13 +130,13 @@ class TurtleStrategy(bt.Strategy):
                 # 存持仓列表
                 temp = util.return_hold_dict(pos, data)
                 util.hold_result = pd.concat([temp, util.hold_result])
-            # 保存每天的账户价值,essential
-        util.date_value_list.append((self.data.datetime.date(0), self.broker.getvalue()))
 
     def log(self, txt, dt=None):
         dt = dt or self.data.datetime.date(0)
         util.trade_dict['date'] = dt
         print('%s, %s' % (dt, txt))
+
+
 def run_turtle(ts_code_list,startdate,enddate):
     cerebro = bt.Cerebro()
     cerebro.addstrategy(TurtleStrategy)
@@ -154,13 +154,13 @@ def run_turtle(ts_code_list,startdate,enddate):
     cerebro.broker.setcash(1000000)
     cerebro.broker.setcommission(commission=0.001)
     util.add_custom_analyzer(cerebro)
+    old_value=cerebro.broker.getvalue()
     result = cerebro.run()
     strat = result[0]
-    indicator_list = [cerebro.broker.getvalue()]
+    indicator_list = [cerebro.broker.getvalue(),(cerebro.broker.getvalue()-old_value)/old_value]
     indicator_list = util.return_indicators_list(strat, indicator_list)
 
-    value_ratio = []
-    value_ratio = util.calculate_date_profit(value_ratio, util.date_value_list)  # 计算每天的策略收益
+    value_ratio=util.return_value_ratio(strat)#计算每天的策略收益
 
     return util.hold_result.sort_values('date'), util.trade_result.sort_values('date'), value_ratio,benchmark, indicator_list
 

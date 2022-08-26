@@ -9,11 +9,12 @@ from . import KeltnerStrategy
 from . import BollStrategy
 from . import gruStrategy
 from . import rnnStrategy
+from . import lstmStrategy
 
 db = pymysql.connect(host='localhost',
                      user='root',
-                     password='123456',
-                     database='quantitative_trading_service_system')
+                     password='505505',
+                     database='test')
 cursor = db.cursor()
 
 
@@ -197,7 +198,7 @@ def rnn(request):
     steps = int(steps)
     rate = float(rate)
     stock_size = int(stock_size)
-    hold_result, trade_result, value_ratio, benchmark, indicator_list = gruStrategy.run_gru_final(stocks, startDate,
+    hold_result, trade_result, value_ratio, benchmark, indicator_list = rnnStrategy.run_rnn_final(stocks, startDate,
                                                                                                   endDate, epoch, steps,
                                                                                                   rate, stock_size)
     hold_result = hold_result.to_json(orient='records')
@@ -208,3 +209,53 @@ def rnn(request):
     return HttpResponse(json.dumps(
         {'hold_result': hold_result, 'trade_result': trade_result, 'value_ratio': value_ratio, 'benchmark': benchmark,
          'indicator_list': indicator_list}))
+
+@csrf_exempt
+def lstm(request):
+    if request.headers['Content-Type'] == "application/json;charset=UTF-8":
+        data = json.loads(request.body.decode('utf-8'))
+        stocks = data.get('stocks')
+        startDate = data.get('startDate')
+        endDate = data.get('endDate')
+        epoch = data.get('epoch')
+        steps = data.get('steps')
+        rate = data.get('rate')
+        stock_size = data.get('stock_size')
+    else:
+        stocks = request.POST.get("stocks")
+        startDate = request.POST.get("startDate")
+        endDate = request.POST.get("endDate")
+        epoch = request.POST.get("epoch")
+        steps = request.POST.get("steps")
+        rate = request.POST.get("rate")
+        stock_size = request.POST.get("stock_size")
+
+    epoch = int(epoch)
+    steps = int(steps)
+    rate = float(rate)
+    stock_size = int(stock_size)
+    hold_result, trade_result, value_ratio, benchmark, indicator_list = lstmStrategy.run_lstm_final(stocks, startDate,
+                                                                                                  endDate, epoch, steps,
+                                                                                                  rate, stock_size)
+    hold_result = hold_result.to_json(orient='records')
+    trade_result = trade_result.to_json(orient='records')
+    value_ratio = value_ratio.to_json(orient='records')
+    benchmark = benchmark.to_json(orient='records')
+
+    return HttpResponse(json.dumps(
+        {'hold_result': hold_result, 'trade_result': trade_result, 'value_ratio': value_ratio, 'benchmark': benchmark,
+         'indicator_list': indicator_list}))
+
+
+@csrf_exempt
+def mytest(request):
+    if request.headers['Content-Type'] == "application/json;charset=UTF-8":
+        data = json.loads(request.body.decode('utf-8'))
+        stocks = data.get('stocks')
+    else:
+        stocks = request.POST.get("stocks")
+
+    print(stocks)
+
+    return HttpResponse(json.dumps({'code':111}))
+

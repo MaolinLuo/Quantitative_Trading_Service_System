@@ -11,4 +11,6 @@ urlpatterns = [
     path('keltner/', views.keltner),
     path('boll/', views.boll),
     path('rnn/', views.rnn),
+    path('lstm/', views.lstm),
+    path('mytest/', views.mytest),
 ]
