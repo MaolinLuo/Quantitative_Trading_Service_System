@@ -72,9 +72,13 @@ def turtle(request):
     stocks = stocks.split(",")
     hold_result, trade_result, value_ratio, benchmark, indicator_list = TurtleStrategy.run_turtle(stocks, startDate,
                                                                                                   endDate)
+    # 格式化，保留两位小数
+    # value_ratio['ratio'] = value_ratio['ratio'].map(lambda x: x * 100)
+    # benchmark['Quote change']=hold_result['Quote change'].apply(lambda x: format(x, '.2%'))
     hold_result = hold_result.to_json(orient='values')
     trade_result = trade_result.to_json(orient='values')
     value_ratio = value_ratio.to_json(orient='values')
+
     benchmark = benchmark.to_json(orient='values')
 
     return HttpResponse(json.dumps(

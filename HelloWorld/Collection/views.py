@@ -29,9 +29,9 @@ def collection(request):
     cursor.execute(sql, (username,code,name))
     results = cursor.fetchall()
     # print(results)
-    if results:# 收藏了该股票，将要删除记录
+    if results:
         return HttpResponse(json.dumps({'code':'222'}))  # 您已收藏该股票！
-    else:# 未收藏该股票，将要增加记录
+    else:
         sql = 'INSERT INTO collection_list (username,code,name) VALUES (%s,%s,%s)'
         cursor.execute(sql, (username, code,name))
         db.commit()
