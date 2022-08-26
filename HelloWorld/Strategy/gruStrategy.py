@@ -181,9 +181,10 @@ def run_gru(ts_code,startdate,enddate):
      cerebro.broker.setcommission(commission=0.001)
 
      util.add_custom_analyzer(cerebro)
+     old_value=cerebro.broker.getvalue()
      result = cerebro.run()
      strat = result[0]
-     indicator_list = [cerebro.broker.getvalue()]
+     indicator_list = [cerebro.broker.getvalue(),(cerebro.broker.getvalue()-old_value)/old_value]
      indicator_list = util.return_indicators_list(strat, indicator_list)
 
      value_ratio = []

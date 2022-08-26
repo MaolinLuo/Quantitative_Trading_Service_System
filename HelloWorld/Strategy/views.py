@@ -12,8 +12,8 @@ from . import rnnStrategy
 
 db = pymysql.connect(host='localhost',
                      user='root',
-                     password='123456',
-                     database='quantitative_trading_service_system')
+                     password='505505',
+                     database='test')
 cursor = db.cursor()
 
 

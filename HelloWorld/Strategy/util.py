@@ -9,6 +9,8 @@ import pandas as pd
 import backtrader as bt
 import backtrader.feeds as btfeeds
 import backtrader.indicators as btind
+import datetime
+
 token="076d7a87e591cad66956800e5e7c65521ed46b2ce008422eec40dcc5"
 trade_dict=dict() #暂存每轮的交易，每轮结束后push到trade_result中
 trade_result=pd.DataFrame(columns=['date','code','status','size','price','transaction'])
@@ -20,14 +22,15 @@ date_value_list=[]
 def get_benchmark(startdate,enddate):
     index_zh_a_hist_df = ak.index_zh_a_hist(symbol="000300", period="daily", start_date=startdate, end_date=enddate)
     df = index_zh_a_hist_df[['日期','涨跌幅']]
-    df.columns = ['date','Quote change']
+    df.columns = ['date','QuoteChange']
     return df
 
 
 def getdata(ts_code):
     pro = ts.pro_api(token)
-
-    df = pro.daily(ts_code=ts_code, start_date="20150101", end_date="20220822").sort_values('trade_date')
+    ISOTIMEFORMAT = '%Y%m%d'
+    date_now = datetime.datetime.now().strftime(ISOTIMEFORMAT)
+    df = pro.daily(ts_code=ts_code, start_date="20150101", end_date=date_now).sort_values('trade_date')
     df.index=pd.to_datetime(df["trade_date"])
     df=df[["open","high","low","close"]]
     return df
