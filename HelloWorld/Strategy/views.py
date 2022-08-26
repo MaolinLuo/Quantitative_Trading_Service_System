@@ -42,12 +42,13 @@ def sma(request):
         endDate = request.POST.get("endDate")
 
     stocks = stocks.split(",")
-    hold_result, trade_result, value_ratio, indicator_list = SmaAverages.run_sma(stocks, startDate, endDate)
+    hold_result, trade_result, value_ratio, benchmark, indicator_list = SmaAverages.run_sma(stocks, startDate, endDate)
     hold_result = hold_result.to_json(orient = 'records')
     trade_result = trade_result.to_json(orient = 'records')
     value_ratio = value_ratio.to_json(orient = 'records')
+    benchmark = benchmark.to_json(orient='records')
     
-    return HttpResponse(json.dumps({'hold_result':hold_result,'trade_result':trade_result,'value_ratio':value_ratio,'indicator_list':indicator_list})) 
+    return HttpResponse(json.dumps({'hold_result':hold_result,'trade_result':trade_result,'value_ratio':value_ratio,'benchmark':benchmark,'indicator_list':indicator_list})) 
 
 @csrf_exempt
 def turtle(request):
@@ -62,12 +63,13 @@ def turtle(request):
         endDate = request.POST.get("endDate")
 
     stocks = stocks.split(",")
-    hold_result, trade_result, value_ratio, indicator_list = TurtleStrategy.run_turtle(stocks, startDate, endDate)
+    hold_result, trade_result, value_ratio, benchmark, indicator_list = TurtleStrategy.run_turtle(stocks, startDate, endDate)
     hold_result = hold_result.to_json(orient = 'records')
     trade_result = trade_result.to_json(orient = 'records')
     value_ratio = value_ratio.to_json(orient = 'records')
+    benchmark = benchmark.to_json(orient='records')
     
-    return HttpResponse(json.dumps({'hold_result':hold_result,'trade_result':trade_result,'value_ratio':value_ratio,'indicator_list':indicator_list})) 
+    return HttpResponse(json.dumps({'hold_result':hold_result,'trade_result':trade_result,'value_ratio':value_ratio,'benchmark':benchmark,'indicator_list':indicator_list})) 
 
 
 @csrf_exempt
@@ -83,12 +85,13 @@ def keltner(request):
         endDate = request.POST.get("endDate")
 
     stocks = stocks.split(",")
-    hold_result, trade_result, value_ratio, indicator_list = KeltnerStrategy.run_keltner(stocks, startDate, endDate)
+    hold_result, trade_result, value_ratio, benchmark, indicator_list = KeltnerStrategy.run_keltner(stocks, startDate, endDate)
     hold_result = hold_result.to_json(orient = 'records')
     trade_result = trade_result.to_json(orient = 'records')
     value_ratio = value_ratio.to_json(orient = 'records')
+    benchmark = benchmark.to_json(orient = 'records')
     
-    return HttpResponse(json.dumps({'hold_result':hold_result,'trade_result':trade_result,'value_ratio':value_ratio,'indicator_list':indicator_list})) 
+    return HttpResponse(json.dumps({'hold_result':hold_result,'trade_result':trade_result,'value_ratio':value_ratio,'benchmark':benchmark, 'indicator_list':indicator_list})) 
 
 @csrf_exempt
 def boll(request):
@@ -103,12 +106,13 @@ def boll(request):
         endDate = request.POST.get("endDate")
 
     stocks = stocks.split(",")
-    hold_result, trade_result, value_ratio, indicator_list = BollStrategy.run_Boll(stocks, startDate, endDate)
+    hold_result, trade_result, value_ratio, benchmark, indicator_list = BollStrategy.run_Boll(stocks, startDate, endDate)
     hold_result = hold_result.to_json(orient = 'records')
     trade_result = trade_result.to_json(orient = 'records')
     value_ratio = value_ratio.to_json(orient = 'records')
-    
-    return HttpResponse(json.dumps({'hold_result':hold_result,'trade_result':trade_result,'value_ratio':value_ratio,'indicator_list':indicator_list})) 
+    benchmark = benchmark.to_json(orient = 'records')
+
+    return HttpResponse(json.dumps({'hold_result':hold_result,'trade_result':trade_result,'value_ratio':value_ratio,'benchmark':benchmark, 'indicator_list':indicator_list})) 
 
 
 
@@ -137,9 +141,10 @@ def gru(request):
     steps = int(steps)
     rate = float(rate)
     stock_size = int(stock_size)
-    hold_result, trade_result, value_ratio, indicator_list = gruStrategy.run_gru_final(stocks, startDate, endDate,epoch,steps,rate,stock_size)
+    hold_result, trade_result, value_ratio, benchmark, indicator_list = gruStrategy.run_gru_final(stocks, startDate, endDate,epoch,steps,rate,stock_size)
     hold_result = hold_result.to_json(orient = 'records')
     trade_result = trade_result.to_json(orient = 'records')
     value_ratio = value_ratio.to_json(orient = 'records')
+    benchmark = benchmark.to_json(orient = 'records')
     
-    return HttpResponse(json.dumps({'hold_result':hold_result,'trade_result':trade_result,'value_ratio':value_ratio,'indicator_list':indicator_list})) 
+    return HttpResponse(json.dumps({'hold_result':hold_result,'trade_result':trade_result,'value_ratio':value_ratio,'benchmark':benchmark, 'indicator_list':indicator_list})) 

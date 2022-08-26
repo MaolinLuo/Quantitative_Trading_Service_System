@@ -174,7 +174,7 @@ def run_gru(ts_code,startdate,enddate):
 
      # 加载交易数据
      cerebro.adddata(data)
-
+     benchmark=util.get_benchmark(startdate,enddate)
      # 设置投资金额100000.0
      cerebro.broker.setcash(1000000.0)
      # # 设置佣金为0.001,除以100去掉%号
@@ -189,7 +189,7 @@ def run_gru(ts_code,startdate,enddate):
      value_ratio = []
      value_ratio = util.calculate_date_profit(value_ratio, util.date_value_list)  # 计算每天的策略收益
 
-     return util.hold_result.sort_values('date'), util.trade_result.sort_values('date'), value_ratio, indicator_list
+     return util.hold_result.sort_values('date'), util.trade_result.sort_values('date'), value_ratio, benchmark, indicator_list
 
 def run_gru_final(ts_code,test_start_date,test_end_date,epoch,_steps,_rate,_stock_size):
     global steps

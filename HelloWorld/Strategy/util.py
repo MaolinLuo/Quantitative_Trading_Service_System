@@ -1,5 +1,7 @@
 from __future__ import (absolute_import, division, print_function,
                         unicode_literals)
+import akshare as ak
+
 import timeit
 import datetime
 import tushare as ts
@@ -14,6 +16,14 @@ hold_dict=dict()
 hold_result=pd.DataFrame(columns=['date','code','size','price','present','profit'])
 date_value_list=[]
 
+
+def get_benchmark(startdate,enddate):
+    index_zh_a_hist_df = ak.index_zh_a_hist(symbol="000300", period="daily", start_date=startdate, end_date=enddate)
+    df = index_zh_a_hist_df[['日期','涨跌幅']]
+    df.columns = ['date','Quote change']
+    return df
+
+
 def getdata(ts_code):
     pro = ts.pro_api(token)
 
@@ -24,7 +34,8 @@ def getdata(ts_code):
 def return_hold_dict(pos,data):
 
 
-    hold_dict['date'] = data.datetime.date(0)
+    hold_dict['date'] = data.datetime.date(0).strftime('%Y-%m-%d')
+
     hold_dict['code'] = data._name
     hold_dict['size'] = pos.size
     hold_dict['price'] = pos.price
@@ -33,7 +44,8 @@ def return_hold_dict(pos,data):
     temp = pd.DataFrame(hold_dict, index=[0])
     return temp
 def return_trade_dict(data,type,size):
-    trade_dict['date'] = data.datetime.date(0)
+    trade_dict['date'] = data.datetime.date(0).strftime('%Y-%m-%d')
+
     trade_dict['code'] = data._name
     trade_dict['status'] = type
     trade_dict['size'] = size
@@ -43,9 +55,9 @@ def return_trade_dict(data,type,size):
     return temp
 def calculate_date_profit(value_ratio,list):
 
-    value_ratio.append([list[0][0],0.0])
+    value_ratio.append([list[0][0].strftime('%Y-%m-%d'),0.0])
     for i in range(1, len(list)):
-        value_ratio.append([list[i][0],(list[i][1] - list[0][1]) / list[0][1]])
+        value_ratio.append([list[i][0].strftime('%Y-%m-%d'),(list[i][1] - list[0][1]) / list[0][1]])
     value_ratio=pd.DataFrame(value_ratio,columns=["date","ratio"])
     return value_ratio
 def add_custom_analyzer(cerebro):

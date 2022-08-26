@@ -150,6 +150,7 @@ def run_turtle(ts_code_list,startdate,enddate):
         stock = util.getdata(ts_code)
         data = util.btfeeds.PandasData(dataname=stock, fromdate=util.datetime.date(start_year, start_month, start_day), todate=util.datetime.date(end_year, end_month, end_day))
         cerebro.adddata(data, name=ts_code)
+    benchmark=util.get_benchmark(startdate,enddate)
     cerebro.broker.setcash(1000000)
     cerebro.broker.setcommission(commission=0.001)
     util.add_custom_analyzer(cerebro)
@@ -161,6 +162,6 @@ def run_turtle(ts_code_list,startdate,enddate):
     value_ratio = []
     value_ratio = util.calculate_date_profit(value_ratio, util.date_value_list)  # 计算每天的策略收益
 
-    return util.hold_result.sort_values('date'), util.trade_result.sort_values('date'), value_ratio, indicator_list
+    return util.hold_result.sort_values('date'), util.trade_result.sort_values('date'), value_ratio,benchmark, indicator_list
 
 
