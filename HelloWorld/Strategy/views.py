@@ -250,14 +250,48 @@ def lstm(request):
 
 
 @csrf_exempt
-def mytest(request):
+def uploadCode(request):
+    # if request.headers['Content-Type'] == "application/json;charset=UTF-8":
+    #     data = json.loads(request.body.decode('utf-8'))
+    #     stocks = data.get('stocks')
+    # else:
+    #     stocks = request.POST.get("stocks")
+
+    filename = './Strategy/UserStrategy.py'
+    with open(filename,'r',errors='ignore') as f:
+        code=f.read()
+        # print(code)
+
+    return HttpResponse(json.dumps({'code':code}))
+
+
+@csrf_exempt
+def downloadCode(request):
     if request.headers['Content-Type'] == "application/json;charset=UTF-8":
         data = json.loads(request.body.decode('utf-8'))
-        stocks = data.get('stocks')
+        # userCodeName = data.get('userCodeName')
+        userCode = data.get('userCode')
     else:
-        stocks = request.POST.get("stocks")
+        # userCodeName = request.POST.get("userCodeName")
+        userCode = request.POST.get("userCode")
 
-    print(stocks)
+    # filename = './Strategy/'+userCodeName+'.py'
+    filename = './Strategy/UserStrategy.py'
+    with open(filename,'w') as f: # 如果filename不存在会自动创建， 'w'表示写数据，写之前会清空文件中的原有数据！
+        f.write(userCode)
+        f.close()
+    
+    from . import UserStrategy
+    hold_result, trade_result, value_ratio, benchmark, indicator_list = UserStrategy.run_user()
+    hold_result = hold_result.to_json(orient='records')
+    trade_result = trade_result.to_json(orient='records')
+    value_ratio = value_ratio.to_json(orient='records')
+    benchmark = benchmark.to_json(orient='records')
+    # print(indicator_list)
 
-    return HttpResponse(json.dumps({'code':111}))
+    return HttpResponse(json.dumps(
+        {'hold_result': hold_result, 'trade_result': trade_result, 'value_ratio': value_ratio, 'benchmark': benchmark,
+         'indicator_list': indicator_list}))
+
+    # return HttpResponse(json.dumps({'code':22}))
 
