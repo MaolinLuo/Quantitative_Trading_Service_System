@@ -56,13 +56,7 @@ def return_trade_dict(data,type,size):
     trade_dict['transaction'] = size * data.close
     temp = pd.DataFrame(trade_dict, index=[0])
     return temp
-def calculate_date_profit(value_ratio,list):
 
-    value_ratio.append([list[0][0].strftime('%Y-%m-%d'),0.0])
-    for i in range(1, len(list)):
-        value_ratio.append([list[i][0].strftime('%Y-%m-%d'),(list[i][1] - list[0][1]) / list[0][1]])
-    value_ratio=pd.DataFrame(value_ratio,columns=["date","ratio"])
-    return value_ratio
 def add_custom_analyzer(cerebro):
     cerebro.addanalyzer(bt.analyzers.Returns, _name="returns")
     cerebro.addanalyzer(bt.analyzers.SharpeRatio,_name="sharpe")
@@ -70,6 +64,7 @@ def add_custom_analyzer(cerebro):
     cerebro.addanalyzer(bt.analyzers.AnnualReturn,_name="annualreturn")
 
     cerebro.addanalyzer(bt.analyzers.SharpeRatio_A,_name="annualsharpe")
+    cerebro.addanalyzer(bt.analyzers.TimeReturn,_name="timereturn")
 
 def return_indicators_list(strat,indicator_list):
     indicator_list.append(strat.analyzers.returns.get_analysis()['rtot'])
@@ -81,8 +76,12 @@ def return_indicators_list(strat,indicator_list):
     return indicator_list
 def return_transaction(strat):
     result=strat.analyzers.tran.get_analysis()
-    print(result.value())
 
-
+def return_value_ratio(strat):
+    d=strat.analyzers.timereturn.get_analysis()
+    df = pd.DataFrame(list(d.items()), columns=['date', 'ratio'])
+    df['date'] = df['date'].apply(lambda x : x.strftime('%Y-%m-%d'))
+    
+    return df
 
 
