@@ -34,7 +34,7 @@ class BollStrategy(bt.Strategy):
 
             if pos.size==0:
 
-                  if self.topline[data._name]<data.close:
+                  if self.supportline[data._name]>data.close:
                    if self.order:
                        return
                    self.params.stakesize=int(self.broker.getcash()/data.close*0.3)
@@ -50,7 +50,7 @@ class BollStrategy(bt.Strategy):
 
             elif pos.size>0:
 
-                if self.supportline[data._name]>=data.close:
+                if self.topline[data._name]<=data.close:
                   self.params.stakesize=pos.size
                   self.order=self.sell(data=data,size=pos.size)
                   temp = util.return_trade_dict(data, "sell", self.params.stakesize)

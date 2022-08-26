@@ -2,15 +2,15 @@ import torch
 import torch.nn as nn
 
 
-class GRUModel(nn.Module):
+class RNNModel(nn.Module):
 
     def __init__(self, input_size=1, hidden_size=64, output_size=1, num_of_layers=20):
-        super(GRUModel, self).__init__()
+        super(RNNModel, self).__init__()
         self.input_size = input_size
         self.hidden_size = hidden_size
         self.output_size = output_size
 
-        self.rnn = nn.GRU(
+        self.rnn = nn.RNN(
             input_size=input_size,
             hidden_size=hidden_size,
             num_layers=num_of_layers,  # 认真参考课时89
