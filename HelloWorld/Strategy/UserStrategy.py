@@ -1,9 +1,9 @@
-
+#hahahahahahahha
 from . import util
 import backtrader as bt
 import pandas as pd
 
-class SmaAverages(bt.Strategy):
+class UserStrategy(bt.Strategy):
 
     params = (
         ('period_sma10', 10),
@@ -30,16 +30,16 @@ class SmaAverages(bt.Strategy):
         self.sma10=dict()
         self.sma30=dict()
         for data in self.datas:
-        # 计算10日均线
+        # 计算10日均�
 
          self.sma10[data._name] = util.btind.MovingAverageSimple(data.close, period=self.params.period_sma10)
-        # 计算30日均线
+        # 计算30日均�
          self.sma30[data._name] = util.btind.MovingAverageSimple(data.close, period=self.params.period_sma30)
 
     def notify_order(self, order):
 
 
-        # 等待订单提交、订单被cerebro接受
+        # 等待订单提交、�单被cerebro接受
         if order.status in [order.Submitted, order.Accepted]:
             return
 
@@ -58,7 +58,7 @@ class SmaAverages(bt.Strategy):
                      order.executed.value,
                      order.executed.comm))
 
-        # 如果订单保证金不足，将不会完成，而是执行以下拒绝程序
+        # 如果订单保证金不足，将不会完成，而是执�以下拒绝程�
         elif order.status in [order.Canceled, order.Margin, order.Rejected]:
             self.log('Order Canceled/Margin/Rejected')
 
@@ -70,7 +70,7 @@ class SmaAverages(bt.Strategy):
             return
 
         self.log('OPERATION PROFIT, GROSS %.2f, NET %.2f' %
-                 (trade.pnl, trade.pnlcomm))  # pnl：盈利  pnlcomm：手续费
+                 (trade.pnl, trade.pnlcomm))  # pnl：盈�  pnlcomm：手��
 
     # 策略逻辑实现
     def next(self):
@@ -79,15 +79,15 @@ class SmaAverages(bt.Strategy):
         global hold_result #essential
         for data in self.datas:
             pos = self.getposition(data)
-            # 当今天的10日均线大于30日均线并且昨天的10日均线小于30日均线，并且该股票没有持仓,则进入市场（买）
+            # 当今天的10日均线大�30日均线并且昨天的10日均线小�30日均线，并且该股票没有持�,则进入市场（买）
             if pos.size==0:
                 if self.sma10[data._name][0] > self.sma30[data._name][0] and self.sma10[data._name][-1] < self.sma30[data._name][-1]:
-                    # 判断订单是否完成，完成则为None，否则为订单信息
+                    # 判断订单�否完成，完成则为None，否则为订单信息
                     if self.order:
                         return
 
 
-                    # 若上一个订单处理完成，可继续执行买入操作
+                    # 若上��订单处理完成，可继续执�买入操�
                     self.params.stakesize = int(self.broker.getcash()/data.close*0.4)
                     self.order = self.buy(data=data,size=self.params.stakesize)
                     #保存每轮交易列表,essential
@@ -95,19 +95,19 @@ class SmaAverages(bt.Strategy):
 
                     util.trade_result = pd.concat([temp, util.trade_result])
 
-            # 当今天的10日均线小于30日均线并且昨天的10日均线大于30日均线，则退出市场（卖）
+            # 当今天的10日均线小�30日均线并且昨天的10日均线大�30日均线，则�出市场（卖）
 
-            elif pos.size>0: #essential,必须要判断此股票是否持仓，如果持仓才能卖
+            elif pos.size>0: #essential,必须要判�此股票是否持仓，如果持仓才能�
 
                 if self.sma10[data._name][0] < self.sma30[data._name][0] and self.sma10[data._name][-1] > self.sma30[data._name][-1]:
                     # 卖出
                     self.params.stakesize = 5000
                     if(pos.size-self.params.stakesize>=0): #即将卖出的数量是大于持仓数量
                         self.order = self.sell(data=data,size=self.params.stakesize)
-                        #保存每轮的交易列表,essential
+                        #保存每轮的交易列�,essential
                         temp=util.return_trade_dict(data,"sell",self.params.stakesize)
                         util.trade_result = pd.concat([temp, util.trade_result])
-                    else:  #如果不大于，则直接清仓，而不是使用上面即将想卖出的数量
+                    else:  #如果不大于，则直接清仓，而不�使用上面即将想卖出的数量
                         self.params.stakesize=pos.size
                         self.order = self.sell(data=data, size=self.params.stakesize)
                         #保存每轮交易列表,essential
@@ -120,14 +120,14 @@ class SmaAverages(bt.Strategy):
             pos = self.getposition(data)
 
             if len(pos):
-                # 存持仓列表
+                # 存持仓列�
                 temp=util.return_hold_dict(pos,data)
                 util.hold_result = pd.concat([temp, util.hold_result])
      
 
-def run_sma(ts_code_list,startdate,enddate):
+def run_user(ts_code_list=['000001.SZ','000002.SZ','000004.SZ','000005.SZ'],startdate='20220419',enddate='20220821'):
     cerebro=bt.Cerebro()
-    cerebro.addstrategy(SmaAverages)
+    cerebro.addstrategy(UserStrategy)
     start_year = int(startdate[0:4])
     start_month = int(startdate[4:6])
     start_day = int(startdate[6:8])
@@ -149,13 +149,13 @@ def run_sma(ts_code_list,startdate,enddate):
     indicator_list = util.return_indicators_list(strat, indicator_list)
 
     
-    value_ratio=util.return_value_ratio(strat)#计算每天的策略收益
+    value_ratio=util.return_value_ratio(strat)#计算每天的策略收�
     return util.hold_result.sort_values('date'),util.trade_result.sort_values('date'),value_ratio,benchmark,indicator_list
 
 
     # hold_result:每日持仓&收益
     # trade_result:交易详情
     # value_ratio:每日策略收益,用来画折线图
-    # indicator_list:一号元素表示剩余持仓价值，二号元素表示复合收益总额,三号元素表示百分数表示年化收益率，四号元素表示最大回撤率，五号元素表示最大回撤金额
-    #六号元素年化夏普比率
+    # indicator_list:�号元素表示剩余持仓价值，二号元素表示复合收益总�,三号元素表示百分数表示年化收益率，四号元素表示最大回撤率，五号元素表示最大回撤金�
+    #�号元素年化�普比率
 
