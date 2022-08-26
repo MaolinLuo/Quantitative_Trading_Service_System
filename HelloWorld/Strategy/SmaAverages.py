@@ -153,13 +153,17 @@ def run_sma(ts_code_list,startdate,enddate):
 
     
     value_ratio=util.return_value_ratio(strat)#计算每天的策略收益
-    return util.hold_result.sort_values('date'),util.trade_result.sort_values('date'),value_ratio,benchmark,indicator_list
+    hold_result_temp = util.hold_result
+    trade_result_temp = util.trade_result
+    util.trade_result = pd.DataFrame(columns=['date', 'code', 'status', 'size', 'price', 'transaction'])
+    util.hold_result = pd.DataFrame(columns=['date', 'code', 'size', 'price', 'present', 'profit'])
+    return hold_result_temp.sort_values('date'), trade_result_temp.sort_values('date'), value_ratio, benchmark, indicator_list
 # run_sma(["000001.SZ,","000002.SZ"],"20190101","20220320")
 
 
     # hold_result:每日持仓&收益
     # trade_result:交易详情
     # value_ratio:每日策略收益,用来画折线图
-    # indicator_list:一号元素表示剩余持仓价值，二号元素表示复合收益总额,三号元素表示百分数表示年化收益率，四号元素表示最大回撤率，五号元素表示最大回撤金额
+    # indicator_list:一号元素表示剩余持仓价值，二号元素是策略收益,二号元素表示复合收益总额,三号元素表示百分数表示年化收益率，四号元素表示最大回撤率，五号元素表示最大回撤金额
     #六号元素年化夏普比率
 

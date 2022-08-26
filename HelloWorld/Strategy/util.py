@@ -40,20 +40,20 @@ def return_hold_dict(pos,data):
     hold_dict['date'] = data.datetime.date(0).strftime('%Y-%m-%d')
 
     hold_dict['code'] = data._name
-    hold_dict['size'] = pos.size
-    hold_dict['price'] = pos.price
-    hold_dict['present'] = pos.adjbase
-    hold_dict['profit'] = pos.size * (pos.adjbase - pos.price)
+    hold_dict['size'] = pos.size#持仓数量
+    hold_dict['price'] = pos.price #成本价
+    hold_dict['present'] = pos.adjbase#现价
+    hold_dict['profit'] = pos.size * (pos.adjbase - pos.price)#盈亏
     temp = pd.DataFrame(hold_dict, index=[0])
     return temp
 def return_trade_dict(data,type,size):
     trade_dict['date'] = data.datetime.date(0).strftime('%Y-%m-%d')
 
     trade_dict['code'] = data._name
-    trade_dict['status'] = type
-    trade_dict['size'] = size
-    trade_dict['price'] = data.close[0]
-    trade_dict['transaction'] = size * data.close
+    trade_dict['status'] = type#买卖
+    trade_dict['size'] = size#成交量
+    trade_dict['price'] = data.close[0]#成交单价
+    trade_dict['transaction'] = size * data.close#成交总额
     temp = pd.DataFrame(trade_dict, index=[0])
     return temp
 

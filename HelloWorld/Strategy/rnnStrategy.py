@@ -188,8 +188,11 @@ def run_rnn(ts_code,startdate,enddate):
      indicator_list = util.return_indicators_list(strat, indicator_list)
 
      value_ratio=util.return_value_ratio(strat)  # 计算每天的策略收益
-
-     return util.hold_result.sort_values('date'), util.trade_result.sort_values('date'), value_ratio, benchmark, indicator_list
+     hold_result_temp = util.hold_result
+     trade_result_temp = util.trade_result
+     util.trade_result = pd.DataFrame(columns=['date', 'code', 'status', 'size', 'price', 'transaction'])
+     util.hold_result = pd.DataFrame(columns=['date', 'code', 'size', 'price', 'present', 'profit'])
+     return hold_result_temp.sort_values('date'), trade_result_temp.sort_values('date'), value_ratio, benchmark, indicator_list
 
 def run_rnn_final(ts_code,test_start_date,test_end_date,epoch,_steps,_rate,_stock_size):
     global steps

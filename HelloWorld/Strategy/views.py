@@ -13,8 +13,8 @@ from . import lstmStrategy
 
 db = pymysql.connect(host='localhost',
                      user='root',
-                     password='505505',
-                     database='test')
+                     password='123456',
+                     database='quantitative_trading_service_system')
 cursor = db.cursor()
 
 
@@ -74,12 +74,14 @@ def turtle(request):
     hold_result, trade_result, value_ratio, benchmark, indicator_list = TurtleStrategy.run_turtle(stocks, startDate,
                                                                                                   endDate)
     # 格式化，保留两位小数
-    # value_ratio['ratio'] = value_ratio['ratio'].map(lambda x: x * 100)
-    # benchmark['Quote change']=hold_result['Quote change'].apply(lambda x: format(x, '.2%'))
+    # value_ratio['ratio'] = value_ratio['ratio'].apply(lambda x: format(x, '.2%'))
+    print(trade_result)
+    value_ratio['ratio'] = value_ratio['ratio'].map(lambda x: x * 100).apply(lambda x: format(x, '.2'))
     hold_result = hold_result.to_json(orient='values')
     trade_result = trade_result.to_json(orient='values')
+    print(trade_result)
     value_ratio = value_ratio.to_json(orient='values')
-
+    # benchmark['QuoteChange'] = benchmark['QuoteChange'].map(lambda x: x / 100).apply(lambda x: format(x, '.2%'))
     benchmark = benchmark.to_json(orient='values')
 
     return HttpResponse(json.dumps(
