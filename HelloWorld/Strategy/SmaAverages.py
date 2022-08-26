@@ -144,6 +144,7 @@ def run_sma(ts_code_list, startdate, enddate):
         end_day = int(enddate[6:8])
         data=btfeeds.PandasData(dataname=stock,fromdate=util.datetime.date(start_year,start_month,start_day),todate=util.datetime.date(end_year,end_month,end_day))
         cerebro.adddata(data,name=ts_code)
+    benchmark=util.get_benchmark(startdate,enddate)
     cerebro.broker.setcash(1000000)
     cerebro.broker.setcommission(commission=0.001)
     util.add_custom_analyzer(cerebro)
@@ -159,7 +160,7 @@ def run_sma(ts_code_list, startdate, enddate):
     # value_ratio:每日策略收益,用来画折线图list
     # indicator_list:一号元素表示剩余持仓价值，二号元素表示复合收益总额,三号元素表示百分数表示年化收益率，
     # 四号元素表示最大回撤率，五号元素表示最大回撤金额,六号元素年化夏普比率list
-    return hold_result.sort_values('date'),trade_result.sort_values('date'),value_ratio,indicator_list
+    return util.hold_result.sort_values('date'), util.trade_result.sort_values('date'), value_ratio,benchmark, indicator_list
 
 
     
