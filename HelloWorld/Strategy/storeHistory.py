@@ -6,15 +6,12 @@ db = pymysql.connect(host='localhost',
                      database='test')
 cursor = db.cursor()
 
-def storeStrategy(hold_result, trade_result, value_ratio, benchmark, indicator_list):
-    sql = 'SELECT * FROM user WHERE username = %s'
-    cursor.execute(sql, name)
-    results = cursor.fetchall()
-    # print(results)
-    if results:
-        return HttpResponse(json.dumps({'code':'222'})) # 用户名已存在
-    else:
-        sql='INSERT INTO user (username,password,isAdmin) VALUES (%s,%s,0)'
-        cursor.execute(sql,(name,password))
+def storeStrategy(username, backtest_id, hold_result, trade_result, value_ratio, benchmark, indicator_list):
+    # 对于每一行，通过列名name访问对应的元素
+    for id_x, row in benchmark.iterrows():
+        date = row[0]
+        QuoteChange = row[1]
+        sql='INSERT INTO benchmark (username,backtest_id,date,num) VALUES (%s,%s,%s,%s)'
+        cursor.execute(sql,(username,backtest_id,date,QuoteChange))
         db.commit()
-        return HttpResponse(json.dumps({'code':'111'})) # 注册成功
+    return 
