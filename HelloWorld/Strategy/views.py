@@ -3,6 +3,8 @@ from django.http import HttpResponse
 import json
 from django.views.decorators.csrf import csrf_exempt
 
+from . import storeHistory
+
 from . import SmaAverages
 from . import TurtleStrategy
 from . import KeltnerStrategy
@@ -67,6 +69,8 @@ def sma(request):
         return HttpResponse(json.dumps({'code':'222'}))
 
     hold_result, trade_result, value_ratio, benchmark, indicator_list = SmaAverages.run_sma(stocks, startDate, endDate)
+    storeHistory.storeStrategy('lml','505',hold_result, trade_result, value_ratio, benchmark, indicator_list)
+
     # 格式化，保留两位小数
     value_ratio['ratio'] = value_ratio['ratio'].map(lambda x: x * 100).apply(lambda x: format(x, '.2')).astype(float)
     value_ratio = value_ratio.to_json(orient='values')
