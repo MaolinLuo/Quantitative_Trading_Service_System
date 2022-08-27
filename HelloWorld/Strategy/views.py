@@ -13,8 +13,8 @@ from . import lstmStrategy
 
 db = pymysql.connect(host='localhost',
                      user='root',
-                     password='505505',
-                     database='test')
+                     password='123456',
+                     database='quantitative_trading_service_system')
 cursor = db.cursor()
 
 
@@ -38,10 +38,14 @@ def list(request):
 def sma(request):
     if request.headers['Content-Type'] == "application/json;charset=UTF-8":
         data = json.loads(request.body.decode('utf-8'))
+        username = data.get('username')
+        backtest_id = data.get('backtest_id')
         stocks = data.get('stocks')
         startDate = data.get('startDate')
         endDate = data.get('endDate')
     else:
+        username = request.POST.get("username")
+        backtest_id = request.POST.get("backtest_id")
         stocks = request.POST.get("stocks")
         startDate = request.POST.get("startDate")
         endDate = request.POST.get("endDate")
@@ -70,14 +74,17 @@ def sma(request):
 def turtle(request):
     if request.headers['Content-Type'] == "application/json;charset=UTF-8":
         data = json.loads(request.body.decode('utf-8'))
+        username=data.get('username')
+        backtest_id=data.get('backtest_id')
         stocks = data.get('stocks')
         startDate = data.get('startDate')
         endDate = data.get('endDate')
     else:
+        username= request.POST.get("username")
+        backtest_id= request.POST.get("backtest_id")
         stocks = request.POST.get("stocks")
         startDate = request.POST.get("startDate")
         endDate = request.POST.get("endDate")
-
     stocks = stocks.split(",")
     hold_result, trade_result, value_ratio, benchmark, indicator_list = TurtleStrategy.run_turtle(stocks, startDate,
                                                                                                   endDate)
@@ -103,10 +110,14 @@ def turtle(request):
 def keltner(request):
     if request.headers['Content-Type'] == "application/json;charset=UTF-8":
         data = json.loads(request.body.decode('utf-8'))
+        username = data.get('username')
+        backtest_id = data.get('backtest_id')
         stocks = data.get('stocks')
         startDate = data.get('startDate')
         endDate = data.get('endDate')
     else:
+        username = request.POST.get("username")
+        backtest_id = request.POST.get("backtest_id")
         stocks = request.POST.get("stocks")
         startDate = request.POST.get("startDate")
         endDate = request.POST.get("endDate")
@@ -136,10 +147,14 @@ def keltner(request):
 def boll(request):
     if request.headers['Content-Type'] == "application/json;charset=UTF-8":
         data = json.loads(request.body.decode('utf-8'))
+        username = data.get('username')
+        backtest_id = data.get('backtest_id')
         stocks = data.get('stocks')
         startDate = data.get('startDate')
         endDate = data.get('endDate')
     else:
+        username = request.POST.get("username")
+        backtest_id = request.POST.get("backtest_id")
         stocks = request.POST.get("stocks")
         startDate = request.POST.get("startDate")
         endDate = request.POST.get("endDate")
@@ -169,6 +184,8 @@ def boll(request):
 def gru(request):
     if request.headers['Content-Type'] == "application/json;charset=UTF-8":
         data = json.loads(request.body.decode('utf-8'))
+        username = data.get('username')
+        backtest_id = data.get('backtest_id')
         stocks = data.get('stocks')
         startDate = data.get('startDate')
         endDate = data.get('endDate')
@@ -177,6 +194,8 @@ def gru(request):
         rate = data.get('rate')
         stock_size = data.get('stock_size')
     else:
+        username = request.POST.get("username")
+        backtest_id = request.POST.get("backtest_id")
         stocks = request.POST.get("stocks")
         startDate = request.POST.get("startDate")
         endDate = request.POST.get("endDate")
@@ -214,6 +233,8 @@ def gru(request):
 def rnn(request):
     if request.headers['Content-Type'] == "application/json;charset=UTF-8":
         data = json.loads(request.body.decode('utf-8'))
+        username = data.get('username')
+        backtest_id = data.get('backtest_id')
         stocks = data.get('stocks')
         startDate = data.get('startDate')
         endDate = data.get('endDate')
@@ -222,6 +243,8 @@ def rnn(request):
         rate = data.get('rate')
         stock_size = data.get('stock_size')
     else:
+        username = request.POST.get("username")
+        backtest_id = request.POST.get("backtest_id")
         stocks = request.POST.get("stocks")
         startDate = request.POST.get("startDate")
         endDate = request.POST.get("endDate")
@@ -258,6 +281,8 @@ def rnn(request):
 def lstm(request):
     if request.headers['Content-Type'] == "application/json;charset=UTF-8":
         data = json.loads(request.body.decode('utf-8'))
+        username = data.get('username')
+        backtest_id = data.get('backtest_id')
         stocks = data.get('stocks')
         startDate = data.get('startDate')
         endDate = data.get('endDate')
@@ -266,6 +291,8 @@ def lstm(request):
         rate = data.get('rate')
         stock_size = data.get('stock_size')
     else:
+        username = request.POST.get("username")
+        backtest_id = request.POST.get("backtest_id")
         stocks = request.POST.get("stocks")
         startDate = request.POST.get("startDate")
         endDate = request.POST.get("endDate")
