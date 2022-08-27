@@ -62,10 +62,3 @@ def storeStrategy(username, backtest_id, hold_result, trade_result, value_ratio,
         sql='INSERT INTO indicator_list (username,backtest_id,remain_values,str_income,multi_income,year_income_rate,max_back,max_amount,xia_rate) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s)'
         cursor.execute(sql,(username,backtest_id,remain_values,str_income,multi_income,year_income_rate,max_back,max_amount,xia_rate))
         db.commit()
-<<<<<<< HEAD
-    return
-=======
-
-
-    return 111
->>>>>>> d79a8f8cd3cea24281eae8bcfd0d465222039642

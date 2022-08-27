@@ -5,7 +5,7 @@ import datetime
 import akshare as ak
 from jqdatasdk import *
 
-auth('13383909875', '13383909875Zc')
+auth('13951687652', 'Syj020608!')
 
 def hello(request):
     return HttpResponse("Hello world!")

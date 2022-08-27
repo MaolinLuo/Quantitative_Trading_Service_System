@@ -1,3 +1,6 @@
+from datetime import datetime
+
+import pandas as pd
 import pymysql
 from django.http import HttpResponse
 import json
@@ -16,13 +19,13 @@ from . import lstmStrategy
 
 from jqdatasdk import get_security_info, auth, normalize_code
 
-auth('13383909875', '13383909875Zc')
+auth('13951687652', 'Syj020608!')
 
 
 db = pymysql.connect(host='localhost',
                      user='root',
-                     password='505505',
-                     database='test')
+                     password='123456',
+                     database='quantitative_trading_service_system')
 cursor = db.cursor()
 
 
@@ -66,13 +69,20 @@ def sma(request):
             ncode = normalize_code(stock)  # 转成聚宽的代码
             display_name = get_security_info(ncode).display_name
     except:
-        return HttpResponse(json.dumps({'code':'222'}))
+        return HttpResponse(json.dumps({'code':'333'}))
 
     hold_result, trade_result, value_ratio, benchmark, indicator_list = SmaAverages.run_sma(stocks, startDate, endDate)
     result = storeHistory.storeStrategy(username,backtest_id,hold_result, trade_result, value_ratio, benchmark, indicator_list)
     if result == 222:
         return HttpResponse(json.dumps({'code':'222'}))
 
+    # 数据入backtest_records库
+    sql = 'INSERT INTO backtest_records (username,backtest_id,start_date,end_date,stocks) VALUES (%s,%s,%s,%s,%s)'
+    cursor.execute(sql, (username, backtest_id,
+                         datetime.strptime(startDate, '%Y%m%d').strftime('%Y-%m-%d'),
+                         datetime.strptime(endDate, '%Y%m%d').strftime('%Y-%m-%d')
+                         , ','.join(stocks)))
+    db.commit()
 
     # 格式化，保留两位小数
     value_ratio['ratio'] = value_ratio['ratio'].map(lambda x: x * 100).apply(lambda x: format(x, '.2')).astype(float)
@@ -114,13 +124,21 @@ def turtle(request):
             ncode = normalize_code(stock)  # 转成聚宽的代码
             display_name = get_security_info(ncode).display_name
     except:
-        return HttpResponse(json.dumps({'code':'222'}))
+        return HttpResponse(json.dumps({'code':'333'}))# 有不存在的股票
+
+    # 数据入backtest_records库
+    sql = 'INSERT INTO backtest_records (username,backtest_id,start_date,end_date,stocks) VALUES (%s,%s,%s,%s,%s)'
+    cursor.execute(sql, (username, backtest_id,
+                         datetime.strptime(startDate, '%Y%m%d').strftime('%Y-%m-%d'),
+                         datetime.strptime(endDate, '%Y%m%d').strftime('%Y-%m-%d')
+                         ,','.join(stocks)))
+    db.commit()
 
     hold_result, trade_result, value_ratio, benchmark, indicator_list = TurtleStrategy.run_turtle(stocks, startDate,
                                                                                                   endDate)
     result = storeHistory.storeStrategy(username,backtest_id,hold_result, trade_result, value_ratio, benchmark, indicator_list)
     if result == 222:
-        return HttpResponse(json.dumps({'code':'222'}))
+        return HttpResponse(json.dumps({'code':'222'}))# 回测记录名重复，请输入不同的回测名称
     # 格式化，保留两位小数
     value_ratio['ratio'] = value_ratio['ratio'].map(lambda x: x * 100).apply(lambda x: format(x, '.2')).astype(float)
     value_ratio = value_ratio.to_json(orient='values')
@@ -162,7 +180,15 @@ def keltner(request):
             ncode = normalize_code(stock)  # 转成聚宽的代码
             display_name = get_security_info(ncode).display_name
     except:
-        return HttpResponse(json.dumps({'code':'222'}))
+        return HttpResponse(json.dumps({'code':'333'}))
+
+    # 数据入backtest_records库
+    sql = 'INSERT INTO backtest_records (username,backtest_id,start_date,end_date,stocks) VALUES (%s,%s,%s,%s,%s)'
+    cursor.execute(sql, (username, backtest_id,
+                         datetime.strptime(startDate, '%Y%m%d').strftime('%Y-%m-%d'),
+                         datetime.strptime(endDate, '%Y%m%d').strftime('%Y-%m-%d')
+                         , ','.join(stocks)))
+    db.commit()
 
     hold_result, trade_result, value_ratio, benchmark, indicator_list = KeltnerStrategy.run_keltner(stocks, startDate,
                                                                                                     endDate)
@@ -211,7 +237,15 @@ def boll(request):
             ncode = normalize_code(stock)  # 转成聚宽的代码
             display_name = get_security_info(ncode).display_name
     except:
-        return HttpResponse(json.dumps({'code':'222'}))
+        return HttpResponse(json.dumps({'code':'333'}))
+
+    # 数据入backtest_records库
+    sql = 'INSERT INTO backtest_records (username,backtest_id,start_date,end_date,stocks) VALUES (%s,%s,%s,%s,%s)'
+    cursor.execute(sql, (username, backtest_id,
+                         datetime.strptime(startDate, '%Y%m%d').strftime('%Y-%m-%d'),
+                         datetime.strptime(endDate, '%Y%m%d').strftime('%Y-%m-%d')
+                         , ','.join(stocks)))
+    db.commit()
 
     hold_result, trade_result, value_ratio, benchmark, indicator_list = BollStrategy.run_Boll(stocks, startDate,
                                                                                               endDate)
@@ -260,7 +294,15 @@ def mfi(request):
             ncode = normalize_code(stock)  # 转成聚宽的代码
             display_name = get_security_info(ncode).display_name
     except:
-        return HttpResponse(json.dumps({'code':'222'}))
+        return HttpResponse(json.dumps({'code':'333'}))
+
+    # 数据入backtest_records库
+    sql = 'INSERT INTO backtest_records (username,backtest_id,start_date,end_date,stocks) VALUES (%s,%s,%s,%s,%s)'
+    cursor.execute(sql, (username, backtest_id,
+                         datetime.strptime(startDate, '%Y%m%d').strftime('%Y-%m-%d'),
+                         datetime.strptime(endDate, '%Y%m%d').strftime('%Y-%m-%d')
+                         , ','.join(stocks)))
+    db.commit()
 
     hold_result, trade_result, value_ratio, benchmark, indicator_list = MfiStrategy.run_mfi(stocks, startDate,
                                                                                               endDate)
@@ -319,7 +361,15 @@ def gru(request):
         ncode = normalize_code(stocks)  # 转成聚宽的代码
         display_name = get_security_info(ncode).display_name
     except:
-        return HttpResponse(json.dumps({'code':'222'}))
+        return HttpResponse(json.dumps({'code':'333'}))
+
+    # 数据入backtest_records库
+    sql = 'INSERT INTO backtest_records (username,backtest_id,start_date,end_date,stocks) VALUES (%s,%s,%s,%s,%s)'
+    cursor.execute(sql, (username, backtest_id,
+                         datetime.strptime(startDate, '%Y%m%d').strftime('%Y-%m-%d'),
+                         datetime.strptime(endDate, '%Y%m%d').strftime('%Y-%m-%d')
+                         , stocks))
+    db.commit()
 
     hold_result, trade_result, value_ratio, benchmark, indicator_list = gruStrategy.run_gru_final(stocks, startDate,
                                                                                                   endDate, epoch, steps,
@@ -378,7 +428,15 @@ def rnn(request):
         ncode = normalize_code(stocks)  # 转成聚宽的代码
         display_name = get_security_info(ncode).display_name
     except:
-        return HttpResponse(json.dumps({'code':'222'}))
+        return HttpResponse(json.dumps({'code':'333'}))
+
+    # 数据入backtest_records库
+    sql = 'INSERT INTO backtest_records (username,backtest_id,start_date,end_date,stocks) VALUES (%s,%s,%s,%s,%s)'
+    cursor.execute(sql, (username, backtest_id,
+                         datetime.strptime(startDate, '%Y%m%d').strftime('%Y-%m-%d'),
+                         datetime.strptime(endDate, '%Y%m%d').strftime('%Y-%m-%d')
+                         , stocks))
+    db.commit()
 
     hold_result, trade_result, value_ratio, benchmark, indicator_list = rnnStrategy.run_rnn_final(stocks, startDate,
                                                                                                   endDate, epoch, steps,
@@ -436,7 +494,15 @@ def lstm(request):
         ncode = normalize_code(stocks)  # 转成聚宽的代码
         display_name = get_security_info(ncode).display_name
     except:
-        return HttpResponse(json.dumps({'code':'222'}))
+        return HttpResponse(json.dumps({'code':'333'}))
+
+    # 数据入backtest_records库
+    sql = 'INSERT INTO backtest_records (username,backtest_id,start_date,end_date,stocks) VALUES (%s,%s,%s,%s,%s)'
+    cursor.execute(sql, (username, backtest_id,
+                         datetime.strptime(startDate, '%Y%m%d').strftime('%Y-%m-%d'),
+                         datetime.strptime(endDate, '%Y%m%d').strftime('%Y-%m-%d')
+                         , stocks))
+    db.commit()
 
     hold_result, trade_result, value_ratio, benchmark, indicator_list = lstmStrategy.run_lstm_final(stocks, startDate,
                                                                                                   endDate, epoch, steps,
@@ -527,9 +593,8 @@ def getBacktestRecords(request):
     sql = 'SELECT * FROM backtest_records WHERE username = %s'
     cursor.execute(sql, username)
     res = fetch_dict_result(cursor)
-    js = json.loads(res)
     db.commit()
-    return HttpResponse(js)
+    return HttpResponse(res)
 
 def getSingleBacktestRecord(request):
     if request.headers['Content-Type'] == "application/json;charset=UTF-8":
@@ -539,34 +604,35 @@ def getSingleBacktestRecord(request):
     else:
         username = request.GET.get("username")
         backtest_id=request.GET.get("backtest_id")
-    sql = 'SELECT * FROM indicator_list WHERE username = %s and backtest_id = %s'
+    sql = 'SELECT remain_values,str_income,multi_income,year_income_rate,max_back,max_amount,xia_rate ' \
+          'FROM indicator_list WHERE username = %s and backtest_id = %s'
     cursor.execute(sql, (username,backtest_id))
-    res = fetch_dict_result(cursor)
-    indicator_list = json.loads(res)
+    results = cursor.fetchall()
+    indicator_list = results[0]
     db.commit()
 
-    sql = 'SELECT * FROM trade_result WHERE username = %s and backtest_id = %s'
+    sql = 'SELECT date,code,status,size,price,transaction FROM trade_result WHERE username = %s and backtest_id = %s'
     cursor.execute(sql, (username, backtest_id))
     res = fetch_dict_result(cursor)
-    trade_result = json.loads(res)
+    trade_result = pd.DataFrame(json.loads(res)).to_json(orient="values")
     db.commit()
 
-    sql = 'SELECT * FROM hold_result WHERE username = %s and backtest_id = %s'
+    sql = 'SELECT date,code,size,price,present,profit FROM hold_result WHERE username = %s and backtest_id = %s'
     cursor.execute(sql, (username, backtest_id))
     res = fetch_dict_result(cursor)
-    hold_result = json.loads(res)
+    hold_result = pd.DataFrame(json.loads(res)).to_json(orient="values")
     db.commit()
 
-    sql = 'SELECT * FROM value_ratio WHERE username = %s and backtest_id = %s'
+    sql = 'SELECT date,ratio FROM value_ratio WHERE username = %s and backtest_id = %s'
     cursor.execute(sql, (username, backtest_id))
     res = fetch_dict_result(cursor)
-    value_ratio = json.loads(res)
+    value_ratio = pd.DataFrame(json.loads(res)).to_json(orient="values")
     db.commit()
 
-    sql = 'SELECT * FROM benchmark WHERE username = %s and backtest_id = %s'
+    sql = 'SELECT date,num FROM benchmark WHERE username = %s and backtest_id = %s'
     cursor.execute(sql, (username, backtest_id))
     res = fetch_dict_result(cursor)
-    benchmark = json.loads(res)
+    benchmark = pd.DataFrame(json.loads(res)).to_json(orient="values")
     db.commit()
 
     return HttpResponse(json.dumps(
