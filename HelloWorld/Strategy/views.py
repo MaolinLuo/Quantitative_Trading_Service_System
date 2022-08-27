@@ -223,10 +223,14 @@ def boll(request):
 def mfi(request):
     if request.headers['Content-Type'] == "application/json;charset=UTF-8":
         data = json.loads(request.body.decode('utf-8'))
+        username = data.get('username')
+        backtest_id = data.get('backtest_id')
         stocks = data.get('stocks')
         startDate = data.get('startDate')
         endDate = data.get('endDate')
     else:
+        username = request.POST.get("username")
+        backtest_id = request.POST.get("backtest_id")
         stocks = request.POST.get("stocks")
         startDate = request.POST.get("startDate")
         endDate = request.POST.get("endDate")
