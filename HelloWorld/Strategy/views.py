@@ -479,4 +479,66 @@ def downloadCode(request):
         {'hold_result': hold_result, 'trade_result': trade_result, 'value_ratio': value_ratio, 'benchmark': benchmark,
          'indicator_list': indicator_list}))
 
+# 工具函数，将Mysqldb中cursor.fetchall()的结果读取为JSON
+def fetch_dict_result(cur):
+    row_headers = [x[0] for x in cur.description]  # this will extract row headers
+    rv = cur.fetchall()
+    json_data = []
+    for result in rv:
+        json_data.append(dict(zip(row_headers, result)))
+    return json.dumps(json_data)
 
+def getBacktestRecords(request):
+    if request.headers['Content-Type'] == "application/json;charset=UTF-8":
+        data = json.loads(request.body.decode('utf-8'))
+        username = data.get('username')
+    else:
+        username = request.GET.get("username")
+    sql = 'SELECT * FROM backtest_records WHERE username = %s'
+    cursor.execute(sql, username)
+    res = fetch_dict_result(cursor)
+    js = json.loads(res)
+    db.commit()
+    return HttpResponse(js)
+
+def getSingleBacktestRecord(request):
+    if request.headers['Content-Type'] == "application/json;charset=UTF-8":
+        data = json.loads(request.body.decode('utf-8'))
+        username = data.get('username')
+        backtest_id=data.get('backtest_id')
+    else:
+        username = request.GET.get("username")
+        backtest_id=request.GET.get("backtest_id")
+    sql = 'SELECT * FROM indicator_list WHERE username = %s and backtest_id = %s'
+    cursor.execute(sql, (username,backtest_id))
+    res = fetch_dict_result(cursor)
+    indicator_list = json.loads(res)
+    db.commit()
+
+    sql = 'SELECT * FROM trade_result WHERE username = %s and backtest_id = %s'
+    cursor.execute(sql, (username, backtest_id))
+    res = fetch_dict_result(cursor)
+    trade_result = json.loads(res)
+    db.commit()
+
+    sql = 'SELECT * FROM hold_result WHERE username = %s and backtest_id = %s'
+    cursor.execute(sql, (username, backtest_id))
+    res = fetch_dict_result(cursor)
+    hold_result = json.loads(res)
+    db.commit()
+
+    sql = 'SELECT * FROM value_ratio WHERE username = %s and backtest_id = %s'
+    cursor.execute(sql, (username, backtest_id))
+    res = fetch_dict_result(cursor)
+    value_ratio = json.loads(res)
+    db.commit()
+
+    sql = 'SELECT * FROM benchmark WHERE username = %s and backtest_id = %s'
+    cursor.execute(sql, (username, backtest_id))
+    res = fetch_dict_result(cursor)
+    benchmark = json.loads(res)
+    db.commit()
+
+    return HttpResponse(json.dumps(
+        {'hold_result': hold_result, 'trade_result': trade_result, 'value_ratio': value_ratio, 'benchmark': benchmark,
+         'indicator_list': indicator_list}))

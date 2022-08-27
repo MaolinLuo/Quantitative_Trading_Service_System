@@ -2,8 +2,8 @@ import pymysql
 
 db = pymysql.connect(host='localhost',
                      user='root',
-                     password='505505',
-                     database='test')
+                     password='123456',
+                     database='quantitative_trading_service_system')
 cursor = db.cursor()
 
 def storeStrategy(username, backtest_id, hold_result, trade_result, value_ratio, benchmark, indicator_list):
@@ -14,4 +14,4 @@ def storeStrategy(username, backtest_id, hold_result, trade_result, value_ratio,
         sql='INSERT INTO benchmark (username,backtest_id,date,num) VALUES (%s,%s,%s,%s)'
         cursor.execute(sql,(username,backtest_id,date,QuoteChange))
         db.commit()
-    return 
+    return

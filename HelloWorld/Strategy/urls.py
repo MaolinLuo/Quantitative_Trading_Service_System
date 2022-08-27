@@ -15,4 +15,6 @@ urlpatterns = [
     path('lstm/', views.lstm),
     path('uploadCode/', views.uploadCode),
     path('downloadCode/', views.downloadCode),
+    path('getBacktestRecords/', views.getBacktestRecords),
+    path('getSingleBacktestRecord/', views.getSingleBacktestRecord),
 ]
