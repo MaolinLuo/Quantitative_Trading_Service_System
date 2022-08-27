@@ -81,7 +81,7 @@ class TurtleStrategy(bt.Strategy):
             return
             # 入场：价格突破上轨线且空仓时
         for data in self.datas:
-         if self.buy_signal[data._name] > 0 and self.buy_count == 0:
+         if self.buy_signal[data._name]> 0 and self.buy_count == 0:
 
             print("buy1")
             self.buy_size = self.broker.getvalue() * 0.01 / self.ATR[data._name]
@@ -134,35 +134,29 @@ class TurtleStrategy(bt.Strategy):
         dt = dt or self.data.datetime.date(0)
         trade_dict['date'] = dt
         print('%s, %s' % (dt, txt))
-def run_turtle(ts_code_list):
+def run_turtle(ts_code_list,startdate,enddate):
     cerebro = bt.Cerebro()
     cerebro.addstrategy(TurtleStrategy)
-    #加载数据
+    start_year = int(startdate[0:4])
+    start_month = int(startdate[4:6])
+    start_day = int(startdate[6:8])
+    end_year = int(enddate[0:4])
+    end_month = int(enddate[4:6])
+    end_day = int(enddate[6:8])
     for ts_code in ts_code_list:
-     stock = getdata(ts_code)
-     data = btfeeds.PandasData(dataname=stock, fromdate=datetime.date(2020, 1, 1), todate=datetime.date(2022, 7, 11))
-     cerebro.adddata(data,name=ts_code)
+        stock = getdata(ts_code)
+        data = btfeeds.PandasData(dataname=stock, fromdate=datetime.date(start_year, start_month, start_day), todate=datetime.date(end_year, end_month, end_day))
+        cerebro.adddata(data, name=ts_code)
     cerebro.broker.setcash(1000000)
     cerebro.broker.setcommission(commission=0.001)
-    cerebro.addanalyzer(bt.analyzers.TimeReturn, _name="time_return")
-    cerebro.addanalyzer(bt.analyzers.SharpeRatio, _name="sharpe")
-    cerebro.addanalyzer(bt.analyzers.DrawDown, _name="drawdown")
-    cerebro.addanalyzer(bt.analyzers.LogReturnsRolling, _name="return_rolling")
-    print('Starting Portfolio Value: %.2f' % cerebro.broker.getvalue())
-    cerebro.addsizer(TradeSizer)
+    add_custom_analyzer(cerebro)
     result = cerebro.run()
     strat = result[0]
-    print('Ending Portfolio Value: %.2f' % cerebro.broker.getvalue())
-    print('sharperatio:', strat.analyzers.sharpe.get_analysis())
-    print('drawdown:', strat.analyzers.drawdown.get_analysis()['max']['drawdown'])
-    print("return_rolling:", strat.analyzers.return_rolling.get_analysis())
-    print("time_return:", strat.analyzers.time_return.get_analysis())
+    indicator_list = [cerebro.broker.getvalue()]
+    indicator_list = return_indicators_list(strat, indicator_list)
+
+    value_ratio=return_value_ratio(strat)  # 计算每天的策略收益
     print(trade_result)
-    print(hold_result)
-    value_ratio = []
-    value_ratio = calculate_date_profit(value_ratio, date_value_list)  # 计算每天的策略收益
-    print(value_ratio)
-    cerebro.plot()
-run_turtle(["000004.SZ","000002.SZ"])
+    return hold_result.sort_values('date'), trade_result.sort_values('date'), value_ratio, indicator_list
 
-
+run_turtle(["000001.SZ","000002.SZ","000004.SZ","000005.SZ"],"20210826","20220826")

@@ -5,6 +5,7 @@ import datetime
 import tushare as ts
 import pandas as pd
 import backtrader as bt
+import akshare as ak
 import backtrader.feeds as btfeeds
 import backtrader.indicators as btind
 token="076d7a87e591cad66956800e5e7c65521ed46b2ce008422eec40dcc5"
@@ -13,7 +14,9 @@ trade_result=pd.DataFrame(columns=['date','code','status','size','price','transa
 hold_dict=dict()
 hold_result=pd.DataFrame(columns=['date','code','size','price','present','profit'])
 date_value_list=[]
-
+# def get_benchmark(startdate,enddate):
+#     index_zh_a_hist_df = ak.index_zh_a_hist(symbol="000300", period="daily", start_date=startdate, end_date=enddate)
+#     return index_zh_a_hist_df[['日期','涨跌幅']]
 def getdata(ts_code):
     pro = ts.pro_api(token)
 
@@ -21,10 +24,17 @@ def getdata(ts_code):
     df.index=pd.to_datetime(df["trade_date"])
     df=df[["open","high","low","close"]]
     return df
+def getmsidata(ts_code):
+    pro = ts.pro_api(token)
+
+    df = pro.daily(ts_code=ts_code, start_date="20150101", end_date="20220822").sort_values('trade_date')
+    df.index=pd.to_datetime(df["trade_date"])
+
+    return df
 def return_hold_dict(pos,data):
 
 
-    hold_dict['date'] = data.datetime.date(0)
+    hold_dict['date'] = data.datetime.date(0).strftime('%Y-%m-%d')
     hold_dict['code'] = data._name
     hold_dict['size'] = pos.size
     hold_dict['price'] = pos.price
@@ -33,7 +43,7 @@ def return_hold_dict(pos,data):
     temp = pd.DataFrame(hold_dict, index=[0])
     return temp
 def return_trade_dict(data,type,size):
-    trade_dict['date'] = data.datetime.date(0)
+    trade_dict['date'] = data.datetime.date(0).strftime('%Y-%m-%d')
     trade_dict['code'] = data._name
     trade_dict['status'] = type
     trade_dict['size'] = size
@@ -41,9 +51,30 @@ def return_trade_dict(data,type,size):
     trade_dict['transaction'] = size * data.close
     temp = pd.DataFrame(trade_dict, index=[0])
     return temp
-def calculate_date_profit(value_ratio,list):
 
-    value_ratio.append(0.0)
-    for i in range(1, len(list)):
-        value_ratio.append((list[i][1] - list[0][1]) / list[0][1])
-    return value_ratio
+def add_custom_analyzer(cerebro):
+    cerebro.addanalyzer(bt.analyzers.Returns, _name="returns")
+    cerebro.addanalyzer(bt.analyzers.SharpeRatio,_name="sharpe")
+    cerebro.addanalyzer(bt.analyzers.DrawDown,_name="drawdown")
+    cerebro.addanalyzer(bt.analyzers.AnnualReturn,_name="annualreturn")
+
+    cerebro.addanalyzer(bt.analyzers.SharpeRatio_A,_name="annualsharpe")
+    cerebro.addanalyzer(bt.analyzers.TimeReturn,_name="timereturn")
+def return_indicators_list(strat,indicator_list):
+    indicator_list.append(strat.analyzers.returns.get_analysis()['rtot'])
+    indicator_list.append(strat.analyzers.returns.get_analysis()['rnorm100'])
+    indicator_list.append(strat.analyzers.drawdown.get_analysis()['max']['drawdown'])
+    indicator_list.append(strat.analyzers.drawdown.get_analysis()['max']['moneydown'])
+    indicator_list.append(strat.analyzers.annualsharpe.get_analysis()['sharperatio'])
+
+    return indicator_list
+
+def return_value_ratio(strat):
+    d = strat.analyzers.timereturn.get_analysis()
+    df = pd.DataFrame(list(d.items()), columns=['date', 'ratio'])
+    df['date'] = df['date'].apply(lambda x : x.strftime('%Y-%m-%d'))
+    df['ratio']=df['ratio'].apply(lambda x:str(x*100)[:4]+"%")
+    return df[['date','ratio']]
+
+
+

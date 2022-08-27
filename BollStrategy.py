@@ -1,4 +1,5 @@
 from utils.util import *
+
 class BollStrategy(bt.Strategy):
     params = (
 
@@ -31,7 +32,7 @@ class BollStrategy(bt.Strategy):
 
             if pos.size==0:
 
-                  if self.topline[data._name]<data.close:
+                  if self.supportline[data._name]>=data.close:
                    if self.order:
                        return
                    self.params.stakesize=int(self.broker.getcash()/data.close*0.3)
@@ -47,7 +48,7 @@ class BollStrategy(bt.Strategy):
 
             elif pos.size>0:
 
-                if self.supportline[data._name]>=data.close:
+                if self.topline[data._name]<=data.close:
                   self.params.stakesize=pos.size
                   self.order=self.sell(data=data,size=pos.size)
                   temp = return_trade_dict(data, "sell", self.params.stakesize)
@@ -59,8 +60,7 @@ class BollStrategy(bt.Strategy):
                  # 存持仓列表
                  temp = return_hold_dict(pos, data)
                  hold_result = pd.concat([temp, hold_result])
-         # 保存每天的账户价值,essential
-         date_value_list.append((self.data.datetime.date(0), self.broker.getvalue()))
+
 
     def log(self, txt, dt=None):
         dt = dt or self.data.datetime.date(0)
@@ -101,19 +101,28 @@ class BollStrategy(bt.Strategy):
 
         self.log('OPERATION PROFIT, GROSS %.2f, NET %.2f' %
                  (trade.pnl, trade.pnlcomm))  # pnl：盈利  pnlcomm：手续费
-def run_Boll(ts_code_list):
+def run_Boll(ts_code_list,startdate,enddate):
     cerebro = bt.Cerebro()
     cerebro.addstrategy(BollStrategy)
+    start_year = int(startdate[0:4])
+    start_month = int(startdate[4:6])
+    start_day = int(startdate[6:8])
+    end_year = int(enddate[0:4])
+    end_month = int(enddate[4:6])
+    end_day = int(enddate[6:8])
     for ts_code in ts_code_list:
         stock = getdata(ts_code)
-        data = btfeeds.PandasData(dataname=stock, fromdate=datetime.date(2020, 1, 1), todate=datetime.date(2022, 7, 11))
+        data = btfeeds.PandasData(dataname=stock, fromdate=datetime.date(start_year, start_month, start_day), todate=datetime.date(end_year, end_month, end_day))
         cerebro.adddata(data, name=ts_code)
     cerebro.broker.setcash(1000000)
-
     cerebro.broker.setcommission(commission=0.001)
-    print('Starting Portfolio Value: %.2f' % cerebro.broker.getvalue())
+    add_custom_analyzer(cerebro)
     result = cerebro.run()
-    print('Ending Portfolio Value: %.2f' % cerebro.broker.getvalue())
+    strat = result[0]
+    indicator_list = [cerebro.broker.getvalue()]
+    indicator_list = return_indicators_list(strat, indicator_list)
 
-    print("trade_list", trade_result.sort_values('date'))
-run_Boll(["000002.SZ","000004.SZ", " 000005.SZ"])
+    value_ratio=return_value_ratio(strat)  # 计算每天的策略收益
+    print(cerebro.broker.getvalue())
+    return hold_result.sort_values('date'), trade_result.sort_values('date'), value_ratio, indicator_list
+run_Boll(["000001.SZ","000004.SZ"],"20200101","20220825")

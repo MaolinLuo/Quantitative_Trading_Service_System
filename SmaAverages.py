@@ -1,7 +1,9 @@
-import multiprocessing
+import pandas as pd
 
 from utils.util import *
+
 class SmaAverages(bt.Strategy):
+
     params = (
         ('period_sma10', 10),
         ('period_sma30', 30),
@@ -28,6 +30,7 @@ class SmaAverages(bt.Strategy):
         self.sma30=dict()
         for data in self.datas:
         # 计算10日均线
+
          self.sma10[data._name] = btind.MovingAverageSimple(data.close, period=self.params.period_sma10)
         # 计算30日均线
          self.sma30[data._name] = btind.MovingAverageSimple(data.close, period=self.params.period_sma30)
@@ -78,12 +81,13 @@ class SmaAverages(bt.Strategy):
      global hold_result #essential
      for data in self.datas:
         pos = self.getposition(data)
-        # 当今天的10日均线大于30日均线并且昨天的10日均线小于30日均线，则进入市场（买）
+        # 当今天的10日均线大于30日均线并且昨天的10日均线小于30日均线，并且该股票没有持仓,则进入市场（买）
         if pos.size==0:
          if self.sma10[data._name][0] > self.sma30[data._name][0] and self.sma10[data._name][-1] < self.sma30[data._name][-1]:
             # 判断订单是否完成，完成则为None，否则为订单信息
             if self.order:
                 return
+
 
             # 若上一个订单处理完成，可继续执行买入操作
             self.params.stakesize = int(self.broker.getcash()/data.close*0.4)
@@ -124,43 +128,39 @@ class SmaAverages(bt.Strategy):
      # 保存每天的账户价值,essential
      date_value_list.append((self.data.datetime.date(0),self.broker.getvalue()))
 
-def run_sma(ts_code_list):
+def run_sma(ts_code_list,startdate,enddate):
     cerebro=bt.Cerebro()
     cerebro.addstrategy(SmaAverages)
+    start_year = int(startdate[0:4])
+    start_month = int(startdate[4:6])
+    start_day = int(startdate[6:8])
+    end_year = int(enddate[0:4])
+    end_month = int(enddate[4:6])
+    end_day = int(enddate[6:8])
     for ts_code in ts_code_list:
       stock=getdata(ts_code)
-      data=btfeeds.PandasData(dataname=stock,fromdate=datetime.date(2020,1,1),todate=datetime.date(2022,7,11))
+      data = btfeeds.PandasData(dataname=stock, fromdate=datetime.date(start_year, start_month, start_day), todate=datetime.date(end_year, end_month, end_day))
       cerebro.adddata(data,name=ts_code)
     cerebro.broker.setcash(1000000)
-
     cerebro.broker.setcommission(commission=0.001)
-    cerebro.addanalyzer(bt.analyzers.TimeReturn, _name="time_return")
-    # cerebro.addanalyzer(bt.analyzers.SharpeRatio,_name="sharpe")
-    # cerebro.addanalyzer(bt.analyzers.DrawDown,_name="drawdown")
-    # cerebro.addanalyzer(bt.analyzers.LogReturnsRolling,_name="return_rolling")
-    print('Starting Portfolio Value: %.2f' % cerebro.broker.getvalue())
+    add_custom_analyzer(cerebro)
+    old_value=cerebro.broker.getvalue()
     result=cerebro.run()
     strat=result[0]
-    print('Ending Portfolio Value: %.2f' % cerebro.broker.getvalue())
-    # print('sharperatio:',strat.analyzers.sharpe.get_analysis())
-    # print('drawdown:',strat.analyzers.drawdown.get_analysis())
-    # print("return_rolling:",strat.analyzers.return_rolling.get_analysis())
+    value_ratio=return_value_ratio(strat)
 
-    # print("time_return:", strat.analyzers.time_return.get_analysis())
-
-    print("hold_list",hold_result.sort_values('date')) #最终持仓详情的结果
-    print("trade_list",trade_result.sort_values('date'))#最终交易详情结果
-
-    value_ratio = []
-    value_ratio=calculate_date_profit(value_ratio,date_value_list)#计算每天的策略收益
-    print(value_ratio)
-if __name__ == '__main__':
-    p1 = multiprocessing.Process(target=run_sma(["000001.SZ","000002.SZ","000004.SZ", " 000005.SZ"]))
-    p2 = multiprocessing.Process(target=run_sma(["000001.SZ", "000002.SZ", "000004.SZ", " 000005.SZ"]))
-
-    # 启动子进程
-    p1.start()
-    p2.start()
+    indicator_list=[cerebro.broker.getvalue(),cerebro.broker.getvalue()-old_value/old_value]
+    indicator_list=return_indicators_list(strat,indicator_list)
 
 
+
+    return hold_result.sort_values('date'),trade_result.sort_values('date'),value_ratio,indicator_list
+run_sma(["000001.SZ,","000002.SZ"],"20200601","20220822")
+
+
+    # hold_result:每日持仓&收益
+    # trade_result:交易详情
+    # value_ratio:每日策略收益,用来画折线图
+    # indicator_list:一号元素表示剩余持仓价值，二号元素表示复合收益总额,三号元素表示百分数表示年化收益率，四号元素表示最大回撤率，五号元素表示最大回撤金额
+    #六号元素年化夏普比率
 
