@@ -48,10 +48,18 @@ def sma(request):
 
     stocks = stocks.split(",")
     hold_result, trade_result, value_ratio, benchmark, indicator_list = SmaAverages.run_sma(stocks, startDate, endDate)
-    hold_result = hold_result.to_json(orient='records')
-    trade_result = trade_result.to_json(orient='records')
-    value_ratio = value_ratio.to_json(orient='records')
-    benchmark = benchmark.to_json(orient='records')
+    # 格式化，保留两位小数
+    value_ratio['ratio'] = value_ratio['ratio'].map(lambda x: x * 100).apply(lambda x: format(x, '.2')).astype(float)
+    value_ratio = value_ratio.to_json(orient='values')
+
+    hold_result['price'] = hold_result['price'].apply(lambda x: format(x, '.2')).astype(float)
+    hold_result['profit'] = hold_result['profit'].apply(lambda x: format(x, '.2')).astype(float)
+    hold_result = hold_result.to_json(orient='values')
+
+    trade_result['transaction'] = trade_result['transaction'].apply(lambda x: format(x, '.2')).astype("float64")
+    trade_result = trade_result.to_json(orient='values')
+
+    benchmark = benchmark.to_json(orient='values')
 
     return HttpResponse(json.dumps(
         {'hold_result': hold_result, 'trade_result': trade_result, 'value_ratio': value_ratio, 'benchmark': benchmark,
@@ -74,14 +82,16 @@ def turtle(request):
     hold_result, trade_result, value_ratio, benchmark, indicator_list = TurtleStrategy.run_turtle(stocks, startDate,
                                                                                                   endDate)
     # 格式化，保留两位小数
-    # value_ratio['ratio'] = value_ratio['ratio'].apply(lambda x: format(x, '.2%'))
-    print(trade_result)
-    value_ratio['ratio'] = value_ratio['ratio'].map(lambda x: x * 100).apply(lambda x: format(x, '.2'))
-    hold_result = hold_result.to_json(orient='values')
-    trade_result = trade_result.to_json(orient='values')
-    print(trade_result)
+    value_ratio['ratio'] = value_ratio['ratio'].map(lambda x: x * 100).apply(lambda x: format(x, '.2')).astype(float)
     value_ratio = value_ratio.to_json(orient='values')
-    # benchmark['QuoteChange'] = benchmark['QuoteChange'].map(lambda x: x / 100).apply(lambda x: format(x, '.2%'))
+
+    hold_result['price']=hold_result['price'].apply(lambda x: format(x, '.2')).astype(float)
+    hold_result['profit']=hold_result['profit'].apply(lambda x: format(x, '.2')).astype(float)
+    hold_result = hold_result.to_json(orient='values')
+
+    trade_result['transaction']=trade_result['transaction'].apply(lambda x: format(x, '.2')).astype("float64")
+    trade_result = trade_result.to_json(orient='values')
+
     benchmark = benchmark.to_json(orient='values')
 
     return HttpResponse(json.dumps(
@@ -104,10 +114,18 @@ def keltner(request):
     stocks = stocks.split(",")
     hold_result, trade_result, value_ratio, benchmark, indicator_list = KeltnerStrategy.run_keltner(stocks, startDate,
                                                                                                     endDate)
-    hold_result = hold_result.to_json(orient='records')
-    trade_result = trade_result.to_json(orient='records')
-    value_ratio = value_ratio.to_json(orient='records')
-    benchmark = benchmark.to_json(orient='records')
+    # 格式化，保留两位小数
+    value_ratio['ratio'] = value_ratio['ratio'].map(lambda x: x * 100).apply(lambda x: format(x, '.2')).astype(float)
+    value_ratio = value_ratio.to_json(orient='values')
+
+    hold_result['price'] = hold_result['price'].apply(lambda x: format(x, '.2')).astype(float)
+    hold_result['profit'] = hold_result['profit'].apply(lambda x: format(x, '.2')).astype(float)
+    hold_result = hold_result.to_json(orient='values')
+
+    trade_result['transaction'] = trade_result['transaction'].apply(lambda x: format(x, '.2')).astype("float64")
+    trade_result = trade_result.to_json(orient='values')
+
+    benchmark = benchmark.to_json(orient='values')
 
     return HttpResponse(json.dumps(
         {'hold_result': hold_result, 'trade_result': trade_result, 'value_ratio': value_ratio, 'benchmark': benchmark,
@@ -129,10 +147,18 @@ def boll(request):
     stocks = stocks.split(",")
     hold_result, trade_result, value_ratio, benchmark, indicator_list = BollStrategy.run_Boll(stocks, startDate,
                                                                                               endDate)
-    hold_result = hold_result.to_json(orient='records')
-    trade_result = trade_result.to_json(orient='records')
-    value_ratio = value_ratio.to_json(orient='records')
-    benchmark = benchmark.to_json(orient='records')
+    # 格式化，保留两位小数
+    value_ratio['ratio'] = value_ratio['ratio'].map(lambda x: x * 100).apply(lambda x: format(x, '.2')).astype(float)
+    value_ratio = value_ratio.to_json(orient='values')
+
+    hold_result['price'] = hold_result['price'].apply(lambda x: format(x, '.2')).astype(float)
+    hold_result['profit'] = hold_result['profit'].apply(lambda x: format(x, '.2')).astype(float)
+    hold_result = hold_result.to_json(orient='values')
+
+    trade_result['transaction'] = trade_result['transaction'].apply(lambda x: format(x, '.2')).astype("float64")
+    trade_result = trade_result.to_json(orient='values')
+
+    benchmark = benchmark.to_json(orient='values')
 
     return HttpResponse(json.dumps(
         {'hold_result': hold_result, 'trade_result': trade_result, 'value_ratio': value_ratio, 'benchmark': benchmark,
@@ -166,10 +192,18 @@ def gru(request):
     hold_result, trade_result, value_ratio, benchmark, indicator_list = gruStrategy.run_gru_final(stocks, startDate,
                                                                                                   endDate, epoch, steps,
                                                                                                   rate, stock_size)
-    hold_result = hold_result.to_json(orient='records')
-    trade_result = trade_result.to_json(orient='records')
-    value_ratio = value_ratio.to_json(orient='records')
-    benchmark = benchmark.to_json(orient='records')
+    # 格式化，保留两位小数
+    value_ratio['ratio'] = value_ratio['ratio'].map(lambda x: x * 10000).apply(lambda x: format(x, '.2')).astype(float)
+    value_ratio = value_ratio.to_json(orient='values')
+
+    hold_result['price'] = hold_result['price'].apply(lambda x: format(x, '.2')).astype(float)
+    hold_result['profit'] = hold_result['profit'].apply(lambda x: format(x, '.2')).astype(float)
+    hold_result = hold_result.to_json(orient='values')
+
+    trade_result['transaction'] = trade_result['transaction'].apply(lambda x: format(x, '.2')).astype("float64")
+    trade_result = trade_result.to_json(orient='values')
+
+    benchmark = benchmark.to_json(orient='values')
 
     return HttpResponse(json.dumps(
         {'hold_result': hold_result, 'trade_result': trade_result, 'value_ratio': value_ratio, 'benchmark': benchmark,
@@ -203,10 +237,18 @@ def rnn(request):
     hold_result, trade_result, value_ratio, benchmark, indicator_list = rnnStrategy.run_rnn_final(stocks, startDate,
                                                                                                   endDate, epoch, steps,
                                                                                                   rate, stock_size)
-    hold_result = hold_result.to_json(orient='records')
-    trade_result = trade_result.to_json(orient='records')
-    value_ratio = value_ratio.to_json(orient='records')
-    benchmark = benchmark.to_json(orient='records')
+    # 格式化，保留两位小数
+    value_ratio['ratio'] = value_ratio['ratio'].map(lambda x: x * 10000).apply(lambda x: format(x, '.2')).astype(float)
+    value_ratio = value_ratio.to_json(orient='values')
+
+    hold_result['price'] = hold_result['price'].apply(lambda x: format(x, '.2')).astype(float)
+    hold_result['profit'] = hold_result['profit'].apply(lambda x: format(x, '.2')).astype(float)
+    hold_result = hold_result.to_json(orient='values')
+
+    trade_result['transaction'] = trade_result['transaction'].apply(lambda x: format(x, '.2')).astype("float64")
+    trade_result = trade_result.to_json(orient='values')
+
+    benchmark = benchmark.to_json(orient='values')
 
     return HttpResponse(json.dumps(
         {'hold_result': hold_result, 'trade_result': trade_result, 'value_ratio': value_ratio, 'benchmark': benchmark,
@@ -239,10 +281,18 @@ def lstm(request):
     hold_result, trade_result, value_ratio, benchmark, indicator_list = lstmStrategy.run_lstm_final(stocks, startDate,
                                                                                                   endDate, epoch, steps,
                                                                                                   rate, stock_size)
-    hold_result = hold_result.to_json(orient='records')
-    trade_result = trade_result.to_json(orient='records')
-    value_ratio = value_ratio.to_json(orient='records')
-    benchmark = benchmark.to_json(orient='records')
+    # 格式化，保留两位小数
+    value_ratio['ratio'] = value_ratio['ratio'].map(lambda x: x * 10000).apply(lambda x: format(x, '.2')).astype(float)
+    value_ratio = value_ratio.to_json(orient='values')
+
+    hold_result['price'] = hold_result['price'].apply(lambda x: format(x, '.2')).astype(float)
+    hold_result['profit'] = hold_result['profit'].apply(lambda x: format(x, '.2')).astype(float)
+    hold_result = hold_result.to_json(orient='values')
+
+    trade_result['transaction'] = trade_result['transaction'].apply(lambda x: format(x, '.2')).astype("float64")
+    trade_result = trade_result.to_json(orient='values')
+
+    benchmark = benchmark.to_json(orient='values')
 
     return HttpResponse(json.dumps(
         {'hold_result': hold_result, 'trade_result': trade_result, 'value_ratio': value_ratio, 'benchmark': benchmark,
