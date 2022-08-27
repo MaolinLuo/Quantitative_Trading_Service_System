@@ -7,9 +7,15 @@ from . import SmaAverages
 from . import TurtleStrategy
 from . import KeltnerStrategy
 from . import BollStrategy
+from . import MfiStrategy
 from . import gruStrategy
 from . import rnnStrategy
 from . import lstmStrategy
+
+from jqdatasdk import get_security_info, auth, normalize_code
+
+auth('13383909875', '13383909875Zc')
+
 
 db = pymysql.connect(host='localhost',
                      user='root',
@@ -51,6 +57,15 @@ def sma(request):
         endDate = request.POST.get("endDate")
 
     stocks = stocks.split(",")
+
+    
+    try:
+        for stock in stocks:
+            ncode = normalize_code(stock)  # 转成聚宽的代码
+            display_name = get_security_info(ncode).display_name
+    except:
+        return HttpResponse(json.dumps({'code':'222'}))
+
     hold_result, trade_result, value_ratio, benchmark, indicator_list = SmaAverages.run_sma(stocks, startDate, endDate)
     # 格式化，保留两位小数
     value_ratio['ratio'] = value_ratio['ratio'].map(lambda x: x * 100).apply(lambda x: format(x, '.2')).astype(float)
@@ -86,6 +101,14 @@ def turtle(request):
         startDate = request.POST.get("startDate")
         endDate = request.POST.get("endDate")
     stocks = stocks.split(",")
+
+    try:
+        for stock in stocks:
+            ncode = normalize_code(stock)  # 转成聚宽的代码
+            display_name = get_security_info(ncode).display_name
+    except:
+        return HttpResponse(json.dumps({'code':'222'}))
+
     hold_result, trade_result, value_ratio, benchmark, indicator_list = TurtleStrategy.run_turtle(stocks, startDate,
                                                                                                   endDate)
     # 格式化，保留两位小数
@@ -123,6 +146,14 @@ def keltner(request):
         endDate = request.POST.get("endDate")
 
     stocks = stocks.split(",")
+
+    try:
+        for stock in stocks:
+            ncode = normalize_code(stock)  # 转成聚宽的代码
+            display_name = get_security_info(ncode).display_name
+    except:
+        return HttpResponse(json.dumps({'code':'222'}))
+
     hold_result, trade_result, value_ratio, benchmark, indicator_list = KeltnerStrategy.run_keltner(stocks, startDate,
                                                                                                     endDate)
     # 格式化，保留两位小数
@@ -160,7 +191,56 @@ def boll(request):
         endDate = request.POST.get("endDate")
 
     stocks = stocks.split(",")
+
+    try:
+        for stock in stocks:
+            ncode = normalize_code(stock)  # 转成聚宽的代码
+            display_name = get_security_info(ncode).display_name
+    except:
+        return HttpResponse(json.dumps({'code':'222'}))
+
     hold_result, trade_result, value_ratio, benchmark, indicator_list = BollStrategy.run_Boll(stocks, startDate,
+                                                                                              endDate)
+    # 格式化，保留两位小数
+    value_ratio['ratio'] = value_ratio['ratio'].map(lambda x: x * 100).apply(lambda x: format(x, '.2')).astype(float)
+    value_ratio = value_ratio.to_json(orient='values')
+
+    hold_result['price'] = hold_result['price'].apply(lambda x: format(x, '.2')).astype(float)
+    hold_result['profit'] = hold_result['profit'].apply(lambda x: format(x, '.2')).astype(float)
+    hold_result = hold_result.to_json(orient='values')
+
+    trade_result['transaction'] = trade_result['transaction'].apply(lambda x: format(x, '.2')).astype("float64")
+    trade_result = trade_result.to_json(orient='values')
+
+    benchmark = benchmark.to_json(orient='values')
+
+    return HttpResponse(json.dumps(
+        {'hold_result': hold_result, 'trade_result': trade_result, 'value_ratio': value_ratio, 'benchmark': benchmark,
+         'indicator_list': indicator_list}))
+
+
+@csrf_exempt
+def mfi(request):
+    if request.headers['Content-Type'] == "application/json;charset=UTF-8":
+        data = json.loads(request.body.decode('utf-8'))
+        stocks = data.get('stocks')
+        startDate = data.get('startDate')
+        endDate = data.get('endDate')
+    else:
+        stocks = request.POST.get("stocks")
+        startDate = request.POST.get("startDate")
+        endDate = request.POST.get("endDate")
+
+    stocks = stocks.split(",")
+
+    try:
+        for stock in stocks:
+            ncode = normalize_code(stock)  # 转成聚宽的代码
+            display_name = get_security_info(ncode).display_name
+    except:
+        return HttpResponse(json.dumps({'code':'222'}))
+
+    hold_result, trade_result, value_ratio, benchmark, indicator_list = MfiStrategy.run_mfi(stocks, startDate,
                                                                                               endDate)
     # 格式化，保留两位小数
     value_ratio['ratio'] = value_ratio['ratio'].map(lambda x: x * 100).apply(lambda x: format(x, '.2')).astype(float)
@@ -208,6 +288,13 @@ def gru(request):
     steps = int(steps)
     rate = float(rate)
     stock_size = int(stock_size)
+
+    try:
+        ncode = normalize_code(stocks)  # 转成聚宽的代码
+        display_name = get_security_info(ncode).display_name
+    except:
+        return HttpResponse(json.dumps({'code':'222'}))
+
     hold_result, trade_result, value_ratio, benchmark, indicator_list = gruStrategy.run_gru_final(stocks, startDate,
                                                                                                   endDate, epoch, steps,
                                                                                                   rate, stock_size)
@@ -257,6 +344,13 @@ def rnn(request):
     steps = int(steps)
     rate = float(rate)
     stock_size = int(stock_size)
+
+    try:
+        ncode = normalize_code(stocks)  # 转成聚宽的代码
+        display_name = get_security_info(ncode).display_name
+    except:
+        return HttpResponse(json.dumps({'code':'222'}))
+
     hold_result, trade_result, value_ratio, benchmark, indicator_list = rnnStrategy.run_rnn_final(stocks, startDate,
                                                                                                   endDate, epoch, steps,
                                                                                                   rate, stock_size)
@@ -305,6 +399,13 @@ def lstm(request):
     steps = int(steps)
     rate = float(rate)
     stock_size = int(stock_size)
+
+    try:
+        ncode = normalize_code(stocks)  # 转成聚宽的代码
+        display_name = get_security_info(ncode).display_name
+    except:
+        return HttpResponse(json.dumps({'code':'222'}))
+
     hold_result, trade_result, value_ratio, benchmark, indicator_list = lstmStrategy.run_lstm_final(stocks, startDate,
                                                                                                   endDate, epoch, steps,
                                                                                                   rate, stock_size)
@@ -370,5 +471,4 @@ def downloadCode(request):
         {'hold_result': hold_result, 'trade_result': trade_result, 'value_ratio': value_ratio, 'benchmark': benchmark,
          'indicator_list': indicator_list}))
 
-    # return HttpResponse(json.dumps({'code':22}))
 

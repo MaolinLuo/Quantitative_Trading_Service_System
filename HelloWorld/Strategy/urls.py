@@ -10,6 +10,7 @@ urlpatterns = [
     path('gru/', views.gru),
     path('keltner/', views.keltner),
     path('boll/', views.boll),
+    path('mfi/', views.mfi),
     path('rnn/', views.rnn),
     path('lstm/', views.lstm),
     path('uploadCode/', views.uploadCode),
