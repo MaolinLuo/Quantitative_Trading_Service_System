@@ -84,4 +84,10 @@ def return_value_ratio(strat):
     
     return df
 
+def getmsidata(ts_code):
+    pro = ts.pro_api(token)
 
+    df = pro.daily(ts_code=ts_code, start_date="20150101", end_date="20220822").sort_values('trade_date')
+    df.index=pd.to_datetime(df["trade_date"])
+
+    return df

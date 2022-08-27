@@ -7,6 +7,7 @@ from . import SmaAverages
 from . import TurtleStrategy
 from . import KeltnerStrategy
 from . import BollStrategy
+from . import MfiStrategy
 from . import gruStrategy
 from . import rnnStrategy
 from . import lstmStrategy
@@ -146,6 +147,39 @@ def boll(request):
 
     stocks = stocks.split(",")
     hold_result, trade_result, value_ratio, benchmark, indicator_list = BollStrategy.run_Boll(stocks, startDate,
+                                                                                              endDate)
+    # 格式化，保留两位小数
+    value_ratio['ratio'] = value_ratio['ratio'].map(lambda x: x * 100).apply(lambda x: format(x, '.2')).astype(float)
+    value_ratio = value_ratio.to_json(orient='values')
+
+    hold_result['price'] = hold_result['price'].apply(lambda x: format(x, '.2')).astype(float)
+    hold_result['profit'] = hold_result['profit'].apply(lambda x: format(x, '.2')).astype(float)
+    hold_result = hold_result.to_json(orient='values')
+
+    trade_result['transaction'] = trade_result['transaction'].apply(lambda x: format(x, '.2')).astype("float64")
+    trade_result = trade_result.to_json(orient='values')
+
+    benchmark = benchmark.to_json(orient='values')
+
+    return HttpResponse(json.dumps(
+        {'hold_result': hold_result, 'trade_result': trade_result, 'value_ratio': value_ratio, 'benchmark': benchmark,
+         'indicator_list': indicator_list}))
+
+
+@csrf_exempt
+def mfi(request):
+    if request.headers['Content-Type'] == "application/json;charset=UTF-8":
+        data = json.loads(request.body.decode('utf-8'))
+        stocks = data.get('stocks')
+        startDate = data.get('startDate')
+        endDate = data.get('endDate')
+    else:
+        stocks = request.POST.get("stocks")
+        startDate = request.POST.get("startDate")
+        endDate = request.POST.get("endDate")
+
+    stocks = stocks.split(",")
+    hold_result, trade_result, value_ratio, benchmark, indicator_list = MfiStrategy.run_mfi(stocks, startDate,
                                                                                               endDate)
     # 格式化，保留两位小数
     value_ratio['ratio'] = value_ratio['ratio'].map(lambda x: x * 100).apply(lambda x: format(x, '.2')).astype(float)
