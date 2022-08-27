@@ -150,17 +150,13 @@ def run_sma(ts_code_list,startdate,enddate):
 
     
     value_ratio=util.return_value_ratio(strat)#计算每天的策略收益
-<<<<<<< HEAD
+
     hold_result_temp = util.hold_result
     trade_result_temp = util.trade_result
     util.trade_result = pd.DataFrame(columns=['date', 'code', 'status', 'size', 'price', 'transaction'])
     util.hold_result = pd.DataFrame(columns=['date', 'code', 'size', 'price', 'present', 'profit'])
     return hold_result_temp.sort_values('date'), trade_result_temp.sort_values('date'), value_ratio, benchmark, indicator_list
-# run_sma(["000001.SZ,","000002.SZ"],"20190101","20220320")
-=======
-    return util.hold_result.sort_values('date'),util.trade_result.sort_values('date'),value_ratio,benchmark,indicator_list
->>>>>>> af41c0cc4f71f69001d533736573ac8e4d97b955
-
+    # run_sma(["000001.SZ,","000002.SZ"],"20190101","20220320")
 
     # hold_result:每日持仓&收益
     # trade_result:交易详情
