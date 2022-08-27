@@ -173,7 +173,7 @@ def run_gru(ts_code,startdate,enddate):
          todate=datetime.datetime(end_year, end_month, end_day))
 
      # 加载交易数据
-     cerebro.adddata(data)
+     cerebro.adddata(data,name=ts_code)
      benchmark=util.get_benchmark(startdate,enddate)
      # 设置投资金额100000.0
      cerebro.broker.setcash(1000000.0)
