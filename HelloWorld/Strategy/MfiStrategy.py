@@ -139,13 +139,14 @@ def run_mfi(ts_code_list,startdate,enddate):
     cerebro.broker.setcash(1000000)
     cerebro.broker.setcommission(commission=0.001)
     util.add_custom_analyzer(cerebro)
+    old_value=cerebro.broker.getvalue()
     result=cerebro.run()
 
     strat=result[0]
-    indicator_list=[cerebro.broker.getvalue()]
+    indicator_list=[cerebro.broker.getvalue(),(cerebro.broker.getvalue()-old_value)/old_value]
     indicator_list=util.return_indicators_list(strat,indicator_list)
-
-
+    print(len(indicator_list))
+    print(indicator_list)
     hold_result_temp = util.hold_result
     trade_result_temp = util.trade_result
     util.trade_result = pd.DataFrame(columns=['date', 'code', 'status', 'size', 'price', 'transaction'])
@@ -153,5 +154,6 @@ def run_mfi(ts_code_list,startdate,enddate):
     value_ratio=util.return_value_ratio(strat)#计算每天的策略收益
     # print(cerebro.broker.getvalue())
     # print(value_ratio)
+
     return hold_result_temp.sort_values('date'),trade_result_temp.sort_values('date'),value_ratio,benchmark,indicator_list
 # run_mfi(["600519.SH","000001.SZ"],"20190101","20220320")
