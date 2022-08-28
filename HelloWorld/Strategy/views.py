@@ -24,8 +24,8 @@ auth('13951687652', 'Syj020608!')
 
 db = pymysql.connect(host='localhost',
                      user='root',
-                     password='123456',
-                     database='quantitative_trading_service_system')
+                     password='505505',
+                     database='test')
 cursor = db.cursor()
 
 
@@ -143,7 +143,7 @@ def turtle(request):
         return HttpResponse(json.dumps({'code':'222'}))
 
     # 数据入backtest_records库
-    sql = 'INSERT INTO backtest_records (username,backtest_id,start_date,end_date,stocks,strtegy)' \
+    sql = 'INSERT INTO backtest_records (username,backtest_id,start_date,end_date,stocks,strategy)' \
           ' VALUES (%s,%s,%s,%s,%s,%s)'
     cursor.execute(sql, (username, backtest_id,
                          datetime.strptime(startDate, '%Y%m%d').strftime('%Y-%m-%d'),
@@ -207,7 +207,7 @@ def keltner(request):
         return HttpResponse(json.dumps({'code':'222'}))
 
     # 数据入backtest_records库
-    sql = 'INSERT INTO backtest_records (username,backtest_id,start_date,end_date,stocks,strtegy)' \
+    sql = 'INSERT INTO backtest_records (username,backtest_id,start_date,end_date,stocks,strategy)' \
           ' VALUES (%s,%s,%s,%s,%s,%s)'
     cursor.execute(sql, (username, backtest_id,
                          datetime.strptime(startDate, '%Y%m%d').strftime('%Y-%m-%d'),
@@ -272,7 +272,7 @@ def boll(request):
         return HttpResponse(json.dumps({'code':'222'}))
 
     # 数据入backtest_records库
-    sql = 'INSERT INTO backtest_records (username,backtest_id,start_date,end_date,stocks,strtegy)' \
+    sql = 'INSERT INTO backtest_records (username,backtest_id,start_date,end_date,stocks,strategy)' \
           ' VALUES (%s,%s,%s,%s,%s,%s)'
     cursor.execute(sql, (username, backtest_id,
                          datetime.strptime(startDate, '%Y%m%d').strftime('%Y-%m-%d'),
@@ -337,7 +337,7 @@ def mfi(request):
         return HttpResponse(json.dumps({'code':'222'}))
 
     # 数据入backtest_records库
-    sql = 'INSERT INTO backtest_records (username,backtest_id,start_date,end_date,stocks,strtegy)' \
+    sql = 'INSERT INTO backtest_records (username,backtest_id,start_date,end_date,stocks,strategy)' \
           ' VALUES (%s,%s,%s,%s,%s,%s)'
     cursor.execute(sql, (username, backtest_id,
                          datetime.strptime(startDate, '%Y%m%d').strftime('%Y-%m-%d'),
@@ -412,7 +412,7 @@ def gru(request):
         return HttpResponse(json.dumps({'code':'222'}))
 
     # 数据入backtest_records库
-    sql = 'INSERT INTO backtest_records (username,backtest_id,start_date,end_date,stocks,strtegy)' \
+    sql = 'INSERT INTO backtest_records (username,backtest_id,start_date,end_date,stocks,strategy)' \
           ' VALUES (%s,%s,%s,%s,%s,%s)'
     cursor.execute(sql, (username, backtest_id,
                          datetime.strptime(startDate, '%Y%m%d').strftime('%Y-%m-%d'),
@@ -487,7 +487,7 @@ def rnn(request):
         return HttpResponse(json.dumps({'code':'222'}))
 
     # 数据入backtest_records库
-    sql = 'INSERT INTO backtest_records (username,backtest_id,start_date,end_date,stocks,strtegy)' \
+    sql = 'INSERT INTO backtest_records (username,backtest_id,start_date,end_date,stocks,strategy)' \
           ' VALUES (%s,%s,%s,%s,%s,%s)'
     cursor.execute(sql, (username, backtest_id,
                          datetime.strptime(startDate, '%Y%m%d').strftime('%Y-%m-%d'),
@@ -560,7 +560,7 @@ def lstm(request):
         return HttpResponse(json.dumps({'code':'222'}))
 
     # 数据入backtest_records库
-    sql = 'INSERT INTO backtest_records (username,backtest_id,start_date,end_date,stocks,strtegy)' \
+    sql = 'INSERT INTO backtest_records (username,backtest_id,start_date,end_date,stocks,strategy)' \
           ' VALUES (%s,%s,%s,%s,%s,%s)'
     cursor.execute(sql, (username, backtest_id,
                          datetime.strptime(startDate, '%Y%m%d').strftime('%Y-%m-%d'),
@@ -593,16 +593,19 @@ def lstm(request):
 
 @csrf_exempt
 def uploadCode(request):
-    # if request.headers['Content-Type'] == "application/json;charset=UTF-8":
-    #     data = json.loads(request.body.decode('utf-8'))
-    #     test = data.get('test')
-    # else:
-    #     test = request.POST.get("test")
-    # print(test)
-    filename = './Strategy/UserStrategy.py'
+    if request.headers['Content-Type'] == "application/json;charset=UTF-8":
+        data = json.loads(request.body.decode('utf-8'))
+        whichCode = data.get('whichCode')
+    else:
+        whichCode = request.POST.get("whichCode")
+
+    if whichCode == 'template':
+        filename = './Strategy/templateUserStrategy.py'
+    elif whichCode == 'user':
+        filename = './Strategy/UserStrategy.py'
     with open(filename,'r',errors='ignore',encoding='utf-8') as f:
         code=f.read()
-        # print(code)
+
 
     return HttpResponse(json.dumps({'code':code}))
 
@@ -611,19 +614,21 @@ def uploadCode(request):
 def downloadCode(request):
     if request.headers['Content-Type'] == "application/json;charset=UTF-8":
         data = json.loads(request.body.decode('utf-8'))
-        # userCodeName = data.get('userCodeName')
+        is_store = data.get('is_store')
         userCode = data.get('userCode')
     else:
-        # userCodeName = request.POST.get("userCodeName")
+        is_store = request.POST.get("is_store")
         userCode = request.POST.get("userCode")
 
-    # filename = './Strategy/'+userCodeName+'.py'
+    
     filename = './Strategy/UserStrategy.py'
     with open(filename,'w') as f: # 如果filename不存在会自动创建， 'w'表示写数据，写之前会清空文件中的原有数据！
         f.write(userCode)
         f.close()
     
-    
+    if is_store == 'store':
+        return
+
     try:
         from . import UserStrategy
         hold_result, trade_result, value_ratio, benchmark, indicator_list = UserStrategy.run_user()
