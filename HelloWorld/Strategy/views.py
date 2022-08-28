@@ -417,7 +417,7 @@ def gru(request):
     cursor.execute(sql, (username, backtest_id,
                          datetime.strptime(startDate, '%Y%m%d').strftime('%Y-%m-%d'),
                          datetime.strptime(endDate, '%Y%m%d').strftime('%Y-%m-%d')
-                         , ','.join(stocks), strategy))
+                         , stocks, strategy))
     db.commit()
 
     hold_result, trade_result, value_ratio, benchmark, indicator_list = gruStrategy.run_gru_final(stocks, startDate,
@@ -492,7 +492,7 @@ def rnn(request):
     cursor.execute(sql, (username, backtest_id,
                          datetime.strptime(startDate, '%Y%m%d').strftime('%Y-%m-%d'),
                          datetime.strptime(endDate, '%Y%m%d').strftime('%Y-%m-%d')
-                         , ','.join(stocks), strategy))
+                         , stocks, strategy))
     db.commit()
 
     hold_result, trade_result, value_ratio, benchmark, indicator_list = rnnStrategy.run_rnn_final(stocks, startDate,
@@ -565,7 +565,7 @@ def lstm(request):
     cursor.execute(sql, (username, backtest_id,
                          datetime.strptime(startDate, '%Y%m%d').strftime('%Y-%m-%d'),
                          datetime.strptime(endDate, '%Y%m%d').strftime('%Y-%m-%d')
-                         , ','.join(stocks), strategy))
+                         , stocks, strategy))
     db.commit()
 
     hold_result, trade_result, value_ratio, benchmark, indicator_list = lstmStrategy.run_lstm_final(stocks, startDate,

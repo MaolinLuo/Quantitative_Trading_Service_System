@@ -145,8 +145,7 @@ def run_mfi(ts_code_list,startdate,enddate):
     strat=result[0]
     indicator_list=[cerebro.broker.getvalue(),(cerebro.broker.getvalue()-old_value)/old_value]
     indicator_list=util.return_indicators_list(strat,indicator_list)
-    print(len(indicator_list))
-    print(indicator_list)
+
     hold_result_temp = util.hold_result
     trade_result_temp = util.trade_result
     util.trade_result = pd.DataFrame(columns=['date', 'code', 'status', 'size', 'price', 'transaction'])
