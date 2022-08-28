@@ -24,8 +24,8 @@ auth('13951687652', 'Syj020608!')
 
 db = pymysql.connect(host='localhost',
                      user='root',
-                     password='123456',
-                     database='quantitative_trading_service_system')
+                     password='505505',
+                     database='test')
 cursor = db.cursor()
 
 
@@ -614,42 +614,68 @@ def uploadCode(request):
 def downloadCode(request):
     if request.headers['Content-Type'] == "application/json;charset=UTF-8":
         data = json.loads(request.body.decode('utf-8'))
-        is_store = data.get('is_store')
+        state = data.get('state')
         userCode = data.get('userCode')
     else:
-        is_store = request.POST.get("is_store")
+        state = request.POST.get("state")
         userCode = request.POST.get("userCode")
 
-    
-    filename = './Strategy/UserStrategy.py'
-    with open(filename,'w') as f: # 如果filename不存在会自动创建， 'w'表示写数据，写之前会清空文件中的原有数据！
-        f.write(userCode)
-        f.close()
-    
-    if is_store == 'store':
-        return
+    if userCode is not None:       
+        filename = './Strategy/UserStrategy.py'
+        with open(filename,'w',encoding='utf-8') as f: # 如果filename不存在会自动创建， 'w'表示写数据，写之前会清空文件中的原有数据！
+            f.write(userCode)
+            f.close()
+    print(state)
+    if state == 'save':
+        return HttpResponse(json.dumps({'code':'111'}))
+    elif state == 'run_user':
+        try:
+            from . import UserStrategy
+            hold_result, trade_result, value_ratio, benchmark, indicator_list = UserStrategy.run_user()
+        except:
+            return HttpResponse(json.dumps({'code':'444'}))
+        # 格式化，保留两位小数
+        value_ratio['ratio'] = value_ratio['ratio'].map(lambda x: x * 10000).apply(lambda x: format(x, '.2')).astype(float)
+        value_ratio = value_ratio.to_json(orient='values')
 
-    try:
-        from . import UserStrategy
-        hold_result, trade_result, value_ratio, benchmark, indicator_list = UserStrategy.run_user()
-    except:
-        return HttpResponse(json.dumps({'code':'444'}))
-    # 格式化，保留两位小数
-    value_ratio['ratio'] = value_ratio['ratio'].map(lambda x: x * 10000).apply(lambda x: format(x, '.2')).astype(float)
-    value_ratio = value_ratio.to_json(orient='values')
+        hold_result['price'] = hold_result['price'].apply(lambda x: format(x, '.2')).astype(float)
+        hold_result['profit'] = hold_result['profit'].apply(lambda x: format(x, '.2')).astype(float)
+        hold_result = hold_result.to_json(orient='values')
 
-    hold_result['price'] = hold_result['price'].apply(lambda x: format(x, '.2')).astype(float)
-    hold_result['profit'] = hold_result['profit'].apply(lambda x: format(x, '.2')).astype(float)
-    hold_result = hold_result.to_json(orient='values')
+        trade_result['transaction'] = trade_result['transaction'].apply(lambda x: format(x, '.2')).astype("float64")
+        trade_result = trade_result.to_json(orient='values')
 
-    trade_result['transaction'] = trade_result['transaction'].apply(lambda x: format(x, '.2')).astype("float64")
-    trade_result = trade_result.to_json(orient='values')
+        benchmark = benchmark.to_json(orient='values')
 
-    benchmark = benchmark.to_json(orient='values')
+        return HttpResponse(json.dumps(
+            {'hold_result': hold_result, 'trade_result': trade_result, 'value_ratio': value_ratio, 'benchmark': benchmark,
+            'indicator_list': indicator_list}))
 
-    return HttpResponse(json.dumps(
-        {'hold_result': hold_result, 'trade_result': trade_result, 'value_ratio': value_ratio, 'benchmark': benchmark,
-         'indicator_list': indicator_list}))
+    elif state == 'run_template':
+        try:
+            from . import templateUserStrategy
+            hold_result, trade_result, value_ratio, benchmark, indicator_list = templateUserStrategy.run_user()
+        except:
+            return HttpResponse(json.dumps({'code':'444'}))
+        # 格式化，保留两位小数
+        value_ratio['ratio'] = value_ratio['ratio'].map(lambda x: x * 10000).apply(lambda x: format(x, '.2')).astype(float)
+        value_ratio = value_ratio.to_json(orient='values')
+
+        hold_result['price'] = hold_result['price'].apply(lambda x: format(x, '.2')).astype(float)
+        hold_result['profit'] = hold_result['profit'].apply(lambda x: format(x, '.2')).astype(float)
+        hold_result = hold_result.to_json(orient='values')
+
+        trade_result['transaction'] = trade_result['transaction'].apply(lambda x: format(x, '.2')).astype("float64")
+        trade_result = trade_result.to_json(orient='values')
+
+        benchmark = benchmark.to_json(orient='values')
+
+        return HttpResponse(json.dumps(
+            {'hold_result': hold_result, 'trade_result': trade_result, 'value_ratio': value_ratio, 'benchmark': benchmark,
+            'indicator_list': indicator_list}))
+
+    else:
+        return HttpResponse(json.dumps({'code':'222'}))
 
 # 工具函数，将Mysqldb中cursor.fetchall()的结果读取为JSON
 def fetch_dict_result(cur):
