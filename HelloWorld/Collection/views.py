@@ -10,8 +10,8 @@ auth('13951687652', 'Syj020608!')
 # 120.46.205.232  Quantitative_Trading_Service_System quantitative_trading_service_system
 db = pymysql.connect(host='localhost',
                      user='root',
-                     password='123456',
-                     database='quantitative_trading_service_system')
+                     password='505505',
+                     database='test')
 cursor = db.cursor()
 
 # 增
