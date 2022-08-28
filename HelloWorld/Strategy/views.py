@@ -24,8 +24,8 @@ auth('13951687652', 'Syj020608!')
 
 db = pymysql.connect(host='localhost',
                      user='root',
-                     password='123456',
-                     database='quantitative_trading_service_system')
+                     password='505505',
+                     database='test')
 cursor = db.cursor()
 
 
@@ -71,10 +71,15 @@ def sma(request):
     except:
         return HttpResponse(json.dumps({'code':'333'}))
 
-    hold_result, trade_result, value_ratio, benchmark, indicator_list = SmaAverages.run_sma(stocks, startDate, endDate)
-    result = storeHistory.storeStrategy(username,backtest_id,hold_result, trade_result, value_ratio, benchmark, indicator_list)
-    if result == 222:
+    sql = 'SELECT * FROM backtest_records WHERE backtest_id = %s'
+    cursor.execute(sql, backtest_id)
+    results = cursor.fetchall()
+    if results:
         return HttpResponse(json.dumps({'code':'222'}))
+
+    hold_result, trade_result, value_ratio, benchmark, indicator_list = SmaAverages.run_sma(stocks, startDate, endDate)
+    storeHistory.storeStrategy(username,backtest_id,hold_result, trade_result, value_ratio, benchmark, indicator_list)
+
 
     # 数据入backtest_records库
     sql = 'INSERT INTO backtest_records (username,backtest_id,start_date,end_date,stocks) VALUES (%s,%s,%s,%s,%s)'
@@ -126,6 +131,12 @@ def turtle(request):
     except:
         return HttpResponse(json.dumps({'code':'333'}))# 有不存在的股票
 
+    sql = 'SELECT * FROM backtest_records WHERE backtest_id = %s'
+    cursor.execute(sql, backtest_id)
+    results = cursor.fetchall()
+    if results:
+        return HttpResponse(json.dumps({'code':'222'}))
+
     # 数据入backtest_records库
     sql = 'INSERT INTO backtest_records (username,backtest_id,start_date,end_date,stocks) VALUES (%s,%s,%s,%s,%s)'
     cursor.execute(sql, (username, backtest_id,
@@ -136,9 +147,8 @@ def turtle(request):
 
     hold_result, trade_result, value_ratio, benchmark, indicator_list = TurtleStrategy.run_turtle(stocks, startDate,
                                                                                                   endDate)
-    result = storeHistory.storeStrategy(username,backtest_id,hold_result, trade_result, value_ratio, benchmark, indicator_list)
-    if result == 222:
-        return HttpResponse(json.dumps({'code':'222'}))# 回测记录名重复，请输入不同的回测名称
+    storeHistory.storeStrategy(username,backtest_id,hold_result, trade_result, value_ratio, benchmark, indicator_list)
+
     # 格式化，保留两位小数
     value_ratio['ratio'] = value_ratio['ratio'].map(lambda x: x * 100).apply(lambda x: format(x, '.2')).astype(float)
     value_ratio = value_ratio.to_json(orient='values')
@@ -182,6 +192,12 @@ def keltner(request):
     except:
         return HttpResponse(json.dumps({'code':'333'}))
 
+    sql = 'SELECT * FROM backtest_records WHERE backtest_id = %s'
+    cursor.execute(sql, backtest_id)
+    results = cursor.fetchall()
+    if results:
+        return HttpResponse(json.dumps({'code':'222'}))
+
     # 数据入backtest_records库
     sql = 'INSERT INTO backtest_records (username,backtest_id,start_date,end_date,stocks) VALUES (%s,%s,%s,%s,%s)'
     cursor.execute(sql, (username, backtest_id,
@@ -193,9 +209,8 @@ def keltner(request):
     hold_result, trade_result, value_ratio, benchmark, indicator_list = KeltnerStrategy.run_keltner(stocks, startDate,
                                                                                                     endDate)
     
-    result = storeHistory.storeStrategy(username,backtest_id,hold_result, trade_result, value_ratio, benchmark, indicator_list)
-    if result == 222:
-        return HttpResponse(json.dumps({'code':'222'}))
+    storeHistory.storeStrategy(username,backtest_id,hold_result, trade_result, value_ratio, benchmark, indicator_list)
+
     # 格式化，保留两位小数
     value_ratio['ratio'] = value_ratio['ratio'].map(lambda x: x * 100).apply(lambda x: format(x, '.2')).astype(float)
     value_ratio = value_ratio.to_json(orient='values')
@@ -239,6 +254,12 @@ def boll(request):
     except:
         return HttpResponse(json.dumps({'code':'333'}))
 
+    sql = 'SELECT * FROM backtest_records WHERE backtest_id = %s'
+    cursor.execute(sql, backtest_id)
+    results = cursor.fetchall()
+    if results:
+        return HttpResponse(json.dumps({'code':'222'}))
+
     # 数据入backtest_records库
     sql = 'INSERT INTO backtest_records (username,backtest_id,start_date,end_date,stocks) VALUES (%s,%s,%s,%s,%s)'
     cursor.execute(sql, (username, backtest_id,
@@ -250,9 +271,8 @@ def boll(request):
     hold_result, trade_result, value_ratio, benchmark, indicator_list = BollStrategy.run_Boll(stocks, startDate,
                                                                                               endDate)
 
-    result = storeHistory.storeStrategy(username,backtest_id,hold_result, trade_result, value_ratio, benchmark, indicator_list)
-    if result == 222:
-        return HttpResponse(json.dumps({'code':'222'}))
+    storeHistory.storeStrategy(username,backtest_id,hold_result, trade_result, value_ratio, benchmark, indicator_list)
+
     # 格式化，保留两位小数
     value_ratio['ratio'] = value_ratio['ratio'].map(lambda x: x * 100).apply(lambda x: format(x, '.2')).astype(float)
     value_ratio = value_ratio.to_json(orient='values')
@@ -296,6 +316,12 @@ def mfi(request):
     except:
         return HttpResponse(json.dumps({'code':'333'}))
 
+    sql = 'SELECT * FROM backtest_records WHERE backtest_id = %s'
+    cursor.execute(sql, backtest_id)
+    results = cursor.fetchall()
+    if results:
+        return HttpResponse(json.dumps({'code':'222'}))
+
     # 数据入backtest_records库
     sql = 'INSERT INTO backtest_records (username,backtest_id,start_date,end_date,stocks) VALUES (%s,%s,%s,%s,%s)'
     cursor.execute(sql, (username, backtest_id,
@@ -307,9 +333,8 @@ def mfi(request):
     hold_result, trade_result, value_ratio, benchmark, indicator_list = MfiStrategy.run_mfi(stocks, startDate,
                                                                                               endDate)
 
-    result = storeHistory.storeStrategy(username,backtest_id,hold_result, trade_result, value_ratio, benchmark, indicator_list)
-    if result == 222:
-        return HttpResponse(json.dumps({'code':'222'}))
+    storeHistory.storeStrategy(username,backtest_id,hold_result, trade_result, value_ratio, benchmark, indicator_list)
+
     # 格式化，保留两位小数
     value_ratio['ratio'] = value_ratio['ratio'].map(lambda x: x * 100).apply(lambda x: format(x, '.2')).astype(float)
     value_ratio = value_ratio.to_json(orient='values')
@@ -363,6 +388,12 @@ def gru(request):
     except:
         return HttpResponse(json.dumps({'code':'333'}))
 
+    sql = 'SELECT * FROM backtest_records WHERE backtest_id = %s'
+    cursor.execute(sql, backtest_id)
+    results = cursor.fetchall()
+    if results:
+        return HttpResponse(json.dumps({'code':'222'}))
+
     # 数据入backtest_records库
     sql = 'INSERT INTO backtest_records (username,backtest_id,start_date,end_date,stocks) VALUES (%s,%s,%s,%s,%s)'
     cursor.execute(sql, (username, backtest_id,
@@ -374,9 +405,8 @@ def gru(request):
     hold_result, trade_result, value_ratio, benchmark, indicator_list = gruStrategy.run_gru_final(stocks, startDate,
                                                                                                   endDate, epoch, steps,
                                                                                                   rate, stock_size)
-    result = storeHistory.storeStrategy(username,backtest_id,hold_result, trade_result, value_ratio, benchmark, indicator_list)
-    if result == 222:
-        return HttpResponse(json.dumps({'code':'222'}))
+    storeHistory.storeStrategy(username,backtest_id,hold_result, trade_result, value_ratio, benchmark, indicator_list)
+
     # 格式化，保留两位小数
     value_ratio['ratio'] = value_ratio['ratio'].map(lambda x: x * 10000).apply(lambda x: format(x, '.2')).astype(float)
     value_ratio = value_ratio.to_json(orient='values')
@@ -430,6 +460,12 @@ def rnn(request):
     except:
         return HttpResponse(json.dumps({'code':'333'}))
 
+    sql = 'SELECT * FROM backtest_records WHERE backtest_id = %s'
+    cursor.execute(sql, backtest_id)
+    results = cursor.fetchall()
+    if results:
+        return HttpResponse(json.dumps({'code':'222'}))
+
     # 数据入backtest_records库
     sql = 'INSERT INTO backtest_records (username,backtest_id,start_date,end_date,stocks) VALUES (%s,%s,%s,%s,%s)'
     cursor.execute(sql, (username, backtest_id,
@@ -441,9 +477,8 @@ def rnn(request):
     hold_result, trade_result, value_ratio, benchmark, indicator_list = rnnStrategy.run_rnn_final(stocks, startDate,
                                                                                                   endDate, epoch, steps,
                                                                                                   rate, stock_size)
-    result = storeHistory.storeStrategy(username,backtest_id,hold_result, trade_result, value_ratio, benchmark, indicator_list)
-    if result == 222:
-        return HttpResponse(json.dumps({'code':'222'}))
+    storeHistory.storeStrategy(username,backtest_id,hold_result, trade_result, value_ratio, benchmark, indicator_list)
+
     # 格式化，保留两位小数
     value_ratio['ratio'] = value_ratio['ratio'].map(lambda x: x * 10000).apply(lambda x: format(x, '.2')).astype(float)
     value_ratio = value_ratio.to_json(orient='values')
@@ -495,6 +530,11 @@ def lstm(request):
         display_name = get_security_info(ncode).display_name
     except:
         return HttpResponse(json.dumps({'code':'333'}))
+    sql = 'SELECT * FROM backtest_records WHERE backtest_id = %s'
+    cursor.execute(sql, backtest_id)
+    results = cursor.fetchall()
+    if results:
+        return HttpResponse(json.dumps({'code':'222'}))
 
     # 数据入backtest_records库
     sql = 'INSERT INTO backtest_records (username,backtest_id,start_date,end_date,stocks) VALUES (%s,%s,%s,%s,%s)'
@@ -507,9 +547,8 @@ def lstm(request):
     hold_result, trade_result, value_ratio, benchmark, indicator_list = lstmStrategy.run_lstm_final(stocks, startDate,
                                                                                                   endDate, epoch, steps,
                                                                                                   rate, stock_size)
-    result = storeHistory.storeStrategy(username,backtest_id,hold_result, trade_result, value_ratio, benchmark, indicator_list)
-    if result == 222:
-        return HttpResponse(json.dumps({'code':'222'}))
+    storeHistory.storeStrategy(username,backtest_id,hold_result, trade_result, value_ratio, benchmark, indicator_list)
+
     # 格式化，保留两位小数
     value_ratio['ratio'] = value_ratio['ratio'].map(lambda x: x * 10000).apply(lambda x: format(x, '.2')).astype(float)
     value_ratio = value_ratio.to_json(orient='values')
@@ -532,12 +571,12 @@ def lstm(request):
 def uploadCode(request):
     # if request.headers['Content-Type'] == "application/json;charset=UTF-8":
     #     data = json.loads(request.body.decode('utf-8'))
-    #     stocks = data.get('stocks')
+    #     test = data.get('test')
     # else:
-    #     stocks = request.POST.get("stocks")
-
+    #     test = request.POST.get("test")
+    # print(test)
     filename = './Strategy/UserStrategy.py'
-    with open(filename,'r',errors='ignore') as f:
+    with open(filename,'r',errors='ignore',encoding='utf-8') as f:
         code=f.read()
         # print(code)
 
@@ -560,16 +599,24 @@ def downloadCode(request):
         f.write(userCode)
         f.close()
     
-    from . import UserStrategy
+    
     try:
+        from . import UserStrategy
         hold_result, trade_result, value_ratio, benchmark, indicator_list = UserStrategy.run_user()
     except:
-        return HttpResponse(json.dumps({'code':222}))
-    hold_result = hold_result.to_json(orient='records')
-    trade_result = trade_result.to_json(orient='records')
-    value_ratio = value_ratio.to_json(orient='records')
-    benchmark = benchmark.to_json(orient='records')
-    # print(indicator_list)
+        return HttpResponse(json.dumps({'code':'444'}))
+    # 格式化，保留两位小数
+    value_ratio['ratio'] = value_ratio['ratio'].map(lambda x: x * 10000).apply(lambda x: format(x, '.2')).astype(float)
+    value_ratio = value_ratio.to_json(orient='values')
+
+    hold_result['price'] = hold_result['price'].apply(lambda x: format(x, '.2')).astype(float)
+    hold_result['profit'] = hold_result['profit'].apply(lambda x: format(x, '.2')).astype(float)
+    hold_result = hold_result.to_json(orient='values')
+
+    trade_result['transaction'] = trade_result['transaction'].apply(lambda x: format(x, '.2')).astype("float64")
+    trade_result = trade_result.to_json(orient='values')
+
+    benchmark = benchmark.to_json(orient='values')
 
     return HttpResponse(json.dumps(
         {'hold_result': hold_result, 'trade_result': trade_result, 'value_ratio': value_ratio, 'benchmark': benchmark,

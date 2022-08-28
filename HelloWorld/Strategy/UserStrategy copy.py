@@ -11,7 +11,7 @@ class UserStrategy(bt.Strategy):
         ('stakesize',0)
     )
 
-    # ´òÓ¡ÈÕÖ¾
+    # æ‰“å°æ—¥å¿—
     def log(self, txt, dt=None):
 
         dt = dt or self.data.datetime.date(0)
@@ -20,30 +20,30 @@ class UserStrategy(bt.Strategy):
 
     def __init__(self):
 
-        # ÓÃÓÚ±£´æ¶©µ¥
+        # ç”¨äºä¿å­˜è®¢å•
         self.order = None
-        # ¶©µ¥¼Û¸ñ
+        # è®¢å•ä»·æ ¼
         self.buyprice = None
-        # ¶©µ¥Ó¶½ğ
+        # è®¢å•ä½£é‡‘
         self.buycomm = None
 
         self.sma10=dict()
         self.sma30=dict()
         for data in self.datas:
-        # ¼ÆËã10ÈÕ¾ù
+        # è®¡ç®—10æ—¥å‡
 
          self.sma10[data._name] = util.btind.MovingAverageSimple(data.close, period=self.params.period_sma10)
-        # ¼ÆËã30ÈÕ¾ù
+        # è®¡ç®—30æ—¥å‡
          self.sma30[data._name] = util.btind.MovingAverageSimple(data.close, period=self.params.period_sma30)
 
     def notify_order(self, order):
 
 
-        # µÈ´ı¶©µ¥Ìá½»¡¢µ¥±»cerebro½ÓÊÜ
+        # ç­‰å¾…è®¢å•æäº¤ã€å•è¢«cerebroæ¥å—
         if order.status in [order.Submitted, order.Accepted]:
             return
 
-        # µÈ´ı¶©µ¥Íê³É
+        # ç­‰å¾…è®¢å•å®Œæˆ
         if order.status in [order.Completed]:
             if order.isbuy():
                 self.log(
@@ -58,7 +58,7 @@ class UserStrategy(bt.Strategy):
                      order.executed.value,
                      order.executed.comm))
 
-        # Èç¹û¶©µ¥±£Ö¤½ğ²»×ã£¬½«²»»áÍê³É£¬¶øÊÇÖ´ÒÔÏÂ¾Ü¾ø³Ì
+        # å¦‚æœè®¢å•ä¿è¯é‡‘ä¸è¶³ï¼Œå°†ä¸ä¼šå®Œæˆï¼Œè€Œæ˜¯æ‰§ä»¥ä¸‹æ‹’ç»ç¨‹
         elif order.status in [order.Canceled, order.Margin, order.Rejected]:
             self.log('Order Canceled/Margin/Rejected')
 
@@ -70,57 +70,57 @@ class UserStrategy(bt.Strategy):
             return
 
         self.log('OPERATION PROFIT, GROSS %.2f, NET %.2f' %
-                 (trade.pnl, trade.pnlcomm))  # pnl£ºÓ¯  pnlcomm£ºÊÖ
+                 (trade.pnl, trade.pnlcomm))  # pnlï¼šç›ˆ  pnlcommï¼šæ‰‹
 
-    # ²ßÂÔÂß¼­ÊµÏÖ
+    # ç­–ç•¥é€»è¾‘å®ç°
     def next(self):
         global date_value_list  #essential
         global trade_result # essential
         global hold_result #essential
         for data in self.datas:
             pos = self.getposition(data)
-            # µ±½ñÌìµÄ10ÈÕ¾ùÏß´ó30ÈÕ¾ùÏß²¢ÇÒ×òÌìµÄ10ÈÕ¾ùÏßĞ¡30ÈÕ¾ùÏß£¬²¢ÇÒ¸Ã¹ÉÆ±Ã»ÓĞ³Ö,Ôò½øÈëÊĞ³¡£¨Âò£©
+            # å½“ä»Šå¤©çš„10æ—¥å‡çº¿å¤§30æ—¥å‡çº¿å¹¶ä¸”æ˜¨å¤©çš„10æ—¥å‡çº¿å°30æ—¥å‡çº¿ï¼Œå¹¶ä¸”è¯¥è‚¡ç¥¨æ²¡æœ‰æŒ,åˆ™è¿›å…¥å¸‚åœºï¼ˆä¹°ï¼‰
             if pos.size==0:
                 if self.sma10[data._name][0] > self.sma30[data._name][0] and self.sma10[data._name][-1] < self.sma30[data._name][-1]:
-                    # ÅĞ¶Ï¶©µ¥·ñÍê³É£¬Íê³ÉÔòÎªNone£¬·ñÔòÎª¶©µ¥ĞÅÏ¢
+                    # åˆ¤æ–­è®¢å•å¦å®Œæˆï¼Œå®Œæˆåˆ™ä¸ºNoneï¼Œå¦åˆ™ä¸ºè®¢å•ä¿¡æ¯
                     if self.order:
                         return
 
 
-                    # ÈôÉÏ¶©µ¥´¦ÀíÍê³É£¬¿É¼ÌĞøÖ´ÂòÈë²Ù
+                    # è‹¥ä¸Šè®¢å•å¤„ç†å®Œæˆï¼Œå¯ç»§ç»­æ‰§ä¹°å…¥æ“
                     self.params.stakesize = int(self.broker.getcash()/data.close*0.4)
                     self.order = self.buy(data=data,size=self.params.stakesize)
-                    #±£´æÃ¿ÂÖ½»Ò×ÁĞ±í,essential
+                    #ä¿å­˜æ¯è½®äº¤æ˜“åˆ—è¡¨,essential
                     temp=util.return_trade_dict(data,"buy",self.params.stakesize)
 
                     util.trade_result = pd.concat([temp, util.trade_result])
 
-            # µ±½ñÌìµÄ10ÈÕ¾ùÏßĞ¡30ÈÕ¾ùÏß²¢ÇÒ×òÌìµÄ10ÈÕ¾ùÏß´ó30ÈÕ¾ùÏß£¬Ôò³öÊĞ³¡£¨Âô£©
+            # å½“ä»Šå¤©çš„10æ—¥å‡çº¿å°30æ—¥å‡çº¿å¹¶ä¸”æ˜¨å¤©çš„10æ—¥å‡çº¿å¤§30æ—¥å‡çº¿ï¼Œåˆ™å‡ºå¸‚åœºï¼ˆå–ï¼‰
 
-            elif pos.size>0: #essential,±ØĞëÒªÅĞ´Ë¹ÉÆ±ÊÇ·ñ³Ö²Ö£¬Èç¹û³Ö²Ö²ÅÄÜ
+            elif pos.size>0: #essential,å¿…é¡»è¦åˆ¤æ­¤è‚¡ç¥¨æ˜¯å¦æŒä»“ï¼Œå¦‚æœæŒä»“æ‰èƒ½
 
                 if self.sma10[data._name][0] < self.sma30[data._name][0] and self.sma10[data._name][-1] > self.sma30[data._name][-1]:
-                    # Âô³ö
+                    # å–å‡º
                     self.params.stakesize = 5000
-                    if(pos.size-self.params.stakesize>=0): #¼´½«Âô³öµÄÊıÁ¿ÊÇ´óÓÚ³Ö²ÖÊıÁ¿
+                    if(pos.size-self.params.stakesize>=0): #å³å°†å–å‡ºçš„æ•°é‡æ˜¯å¤§äºæŒä»“æ•°é‡
                         self.order = self.sell(data=data,size=self.params.stakesize)
-                        #±£´æÃ¿ÂÖµÄ½»Ò×ÁĞ,essential
+                        #ä¿å­˜æ¯è½®çš„äº¤æ˜“åˆ—,essential
                         temp=util.return_trade_dict(data,"sell",self.params.stakesize)
                         util.trade_result = pd.concat([temp, util.trade_result])
-                    else:  #Èç¹û²»´óÓÚ£¬ÔòÖ±½ÓÇå²Ö£¬¶ø²»Ê¹ÓÃÉÏÃæ¼´½«ÏëÂô³öµÄÊıÁ¿
+                    else:  #å¦‚æœä¸å¤§äºï¼Œåˆ™ç›´æ¥æ¸…ä»“ï¼Œè€Œä¸ä½¿ç”¨ä¸Šé¢å³å°†æƒ³å–å‡ºçš„æ•°é‡
                         self.params.stakesize=pos.size
                         self.order = self.sell(data=data, size=self.params.stakesize)
-                        #±£´æÃ¿ÂÖ½»Ò×ÁĞ±í,essential
+                        #ä¿å­˜æ¯è½®äº¤æ˜“åˆ—è¡¨,essential
                         temp=util.return_trade_dict(data,"sell",self.params.stakesize)
                         util.trade_result = pd.concat([temp, util.trade_result])
 
-        # Ã¿ÂÖÂòÂô½áÊøºó£¬¿´³Ö²ÖµÄ¹ÉÆ±,essential
+        # æ¯è½®ä¹°å–ç»“æŸåï¼Œçœ‹æŒä»“çš„è‚¡ç¥¨,essential
         for data in self.datas:
 
             pos = self.getposition(data)
 
             if len(pos):
-                # ´æ³Ö²ÖÁĞ
+                # å­˜æŒä»“åˆ—
                 temp=util.return_hold_dict(pos,data)
                 util.hold_result = pd.concat([temp, util.hold_result])
      
@@ -149,13 +149,13 @@ def run_user(ts_code_list=['000001.SZ','000002.SZ'],startdate='20220419',enddate
     indicator_list = util.return_indicators_list(strat, indicator_list)
 
     
-    value_ratio=util.return_value_ratio(strat)#¼ÆËãÃ¿ÌìµÄ²ßÂÔÊÕÒæ
+    value_ratio=util.return_value_ratio(strat)#è®¡ç®—æ¯å¤©çš„ç­–ç•¥æ”¶ç›Š
     return util.hold_result.sort_values('date'),util.trade_result.sort_values('date'),value_ratio,benchmark,indicator_list
 
 
-    # hold_result:Ã¿ÈÕ³Ö²Ö&ÊÕÒæ
-    # trade_result:½»Ò×ÏêÇé
-    # value_ratio:Ã¿ÈÕ²ßÂÔÊÕÒæ,ÓÃÀ´»­ÕÛÏßÍ¼
-    # indicator_list:Ò»ºÅÔªËØ±íÊ¾Ê£Óà³Ö²Ö¼ÛÖµ£¬¶şºÅÔªËØ±íÊ¾²ßÂÔÊÕÒæ,ÈıºÅÔªËØ±íÊ¾×Ü¸´ºÏÊÕÒæ,ËÄºÅÔªËØ±íÊ¾°Ù·ÖÊı±íÊ¾Äê»¯ÊÕÒæÂÊ£¬ÎåºÅÔªËØ±íÊ¾×î´ó»Ø³·ÂÊ£¬
-    #ÁùºÅÔªËØ±íÊ¾×î´ó»Ø³·½ğ£¬ÆßºÅÔªËØÄê»¯ÆÕ±ÈÂÊ
+    # hold_result:æ¯æ—¥æŒä»“&æ”¶ç›Š
+    # trade_result:äº¤æ˜“è¯¦æƒ…
+    # value_ratio:æ¯æ—¥ç­–ç•¥æ”¶ç›Š,ç”¨æ¥ç”»æŠ˜çº¿å›¾
+    # indicator_list:ä¸€å·å…ƒç´ è¡¨ç¤ºå‰©ä½™æŒä»“ä»·å€¼ï¼ŒäºŒå·å…ƒç´ è¡¨ç¤ºç­–ç•¥æ”¶ç›Š,ä¸‰å·å…ƒç´ è¡¨ç¤ºæ€»å¤åˆæ”¶ç›Š,å››å·å…ƒç´ è¡¨ç¤ºç™¾åˆ†æ•°è¡¨ç¤ºå¹´åŒ–æ”¶ç›Šç‡ï¼Œäº”å·å…ƒç´ è¡¨ç¤ºæœ€å¤§å›æ’¤ç‡ï¼Œ
+    #å…­å·å…ƒç´ è¡¨ç¤ºæœ€å¤§å›æ’¤é‡‘ï¼Œä¸ƒå·å…ƒç´ å¹´åŒ–æ™®æ¯”ç‡
 
