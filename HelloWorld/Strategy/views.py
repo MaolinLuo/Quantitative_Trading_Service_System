@@ -24,8 +24,8 @@ auth('13951687652', 'Syj020608!')
 
 db = pymysql.connect(host='localhost',
                      user='root',
-                     password='505505',
-                     database='test')
+                     password='123456',
+                     database='quantitative_trading_service_system')
 cursor = db.cursor()
 
 
@@ -49,12 +49,14 @@ def list(request):
 def sma(request):
     if request.headers['Content-Type'] == "application/json;charset=UTF-8":
         data = json.loads(request.body.decode('utf-8'))
+        strategy=data.get('strategy')
         username = data.get('username')
         backtest_id = data.get('backtest_id')
         stocks = data.get('stocks')
         startDate = data.get('startDate')
         endDate = data.get('endDate')
     else:
+        strategy = request.POST.get("strategy")
         username = request.POST.get("username")
         backtest_id = request.POST.get("backtest_id")
         stocks = request.POST.get("stocks")
@@ -82,11 +84,12 @@ def sma(request):
 
 
     # 数据入backtest_records库
-    sql = 'INSERT INTO backtest_records (username,backtest_id,start_date,end_date,stocks) VALUES (%s,%s,%s,%s,%s)'
+    sql = 'INSERT INTO backtest_records (username,backtest_id,start_date,end_date,stocks,strategy)' \
+          ' VALUES (%s,%s,%s,%s,%s,%s)'
     cursor.execute(sql, (username, backtest_id,
                          datetime.strptime(startDate, '%Y%m%d').strftime('%Y-%m-%d'),
                          datetime.strptime(endDate, '%Y%m%d').strftime('%Y-%m-%d')
-                         , ','.join(stocks)))
+                         , ','.join(stocks),strategy))
     db.commit()
 
     # 格式化，保留两位小数
@@ -111,12 +114,14 @@ def sma(request):
 def turtle(request):
     if request.headers['Content-Type'] == "application/json;charset=UTF-8":
         data = json.loads(request.body.decode('utf-8'))
+        strategy = data.get('strategy')
         username=data.get('username')
         backtest_id=data.get('backtest_id')
         stocks = data.get('stocks')
         startDate = data.get('startDate')
         endDate = data.get('endDate')
     else:
+        strategy = request.POST.get("strategy")
         username= request.POST.get("username")
         backtest_id= request.POST.get("backtest_id")
         stocks = request.POST.get("stocks")
@@ -138,11 +143,12 @@ def turtle(request):
         return HttpResponse(json.dumps({'code':'222'}))
 
     # 数据入backtest_records库
-    sql = 'INSERT INTO backtest_records (username,backtest_id,start_date,end_date,stocks) VALUES (%s,%s,%s,%s,%s)'
+    sql = 'INSERT INTO backtest_records (username,backtest_id,start_date,end_date,stocks,strtegy)' \
+          ' VALUES (%s,%s,%s,%s,%s,%s)'
     cursor.execute(sql, (username, backtest_id,
                          datetime.strptime(startDate, '%Y%m%d').strftime('%Y-%m-%d'),
                          datetime.strptime(endDate, '%Y%m%d').strftime('%Y-%m-%d')
-                         ,','.join(stocks)))
+                         , ','.join(stocks), strategy))
     db.commit()
 
     hold_result, trade_result, value_ratio, benchmark, indicator_list = TurtleStrategy.run_turtle(stocks, startDate,
@@ -171,12 +177,14 @@ def turtle(request):
 def keltner(request):
     if request.headers['Content-Type'] == "application/json;charset=UTF-8":
         data = json.loads(request.body.decode('utf-8'))
+        strategy = data.get('strategy')
         username = data.get('username')
         backtest_id = data.get('backtest_id')
         stocks = data.get('stocks')
         startDate = data.get('startDate')
         endDate = data.get('endDate')
     else:
+        strategy = request.POST.get("strategy")
         username = request.POST.get("username")
         backtest_id = request.POST.get("backtest_id")
         stocks = request.POST.get("stocks")
@@ -199,11 +207,12 @@ def keltner(request):
         return HttpResponse(json.dumps({'code':'222'}))
 
     # 数据入backtest_records库
-    sql = 'INSERT INTO backtest_records (username,backtest_id,start_date,end_date,stocks) VALUES (%s,%s,%s,%s,%s)'
+    sql = 'INSERT INTO backtest_records (username,backtest_id,start_date,end_date,stocks,strtegy)' \
+          ' VALUES (%s,%s,%s,%s,%s,%s)'
     cursor.execute(sql, (username, backtest_id,
                          datetime.strptime(startDate, '%Y%m%d').strftime('%Y-%m-%d'),
                          datetime.strptime(endDate, '%Y%m%d').strftime('%Y-%m-%d')
-                         , ','.join(stocks)))
+                         , ','.join(stocks), strategy))
     db.commit()
 
     hold_result, trade_result, value_ratio, benchmark, indicator_list = KeltnerStrategy.run_keltner(stocks, startDate,
@@ -233,12 +242,14 @@ def keltner(request):
 def boll(request):
     if request.headers['Content-Type'] == "application/json;charset=UTF-8":
         data = json.loads(request.body.decode('utf-8'))
+        strategy = data.get('strategy')
         username = data.get('username')
         backtest_id = data.get('backtest_id')
         stocks = data.get('stocks')
         startDate = data.get('startDate')
         endDate = data.get('endDate')
     else:
+        strategy = request.POST.get("strategy")
         username = request.POST.get("username")
         backtest_id = request.POST.get("backtest_id")
         stocks = request.POST.get("stocks")
@@ -261,11 +272,12 @@ def boll(request):
         return HttpResponse(json.dumps({'code':'222'}))
 
     # 数据入backtest_records库
-    sql = 'INSERT INTO backtest_records (username,backtest_id,start_date,end_date,stocks) VALUES (%s,%s,%s,%s,%s)'
+    sql = 'INSERT INTO backtest_records (username,backtest_id,start_date,end_date,stocks,strtegy)' \
+          ' VALUES (%s,%s,%s,%s,%s,%s)'
     cursor.execute(sql, (username, backtest_id,
                          datetime.strptime(startDate, '%Y%m%d').strftime('%Y-%m-%d'),
                          datetime.strptime(endDate, '%Y%m%d').strftime('%Y-%m-%d')
-                         , ','.join(stocks)))
+                         , ','.join(stocks), strategy))
     db.commit()
 
     hold_result, trade_result, value_ratio, benchmark, indicator_list = BollStrategy.run_Boll(stocks, startDate,
@@ -295,12 +307,14 @@ def boll(request):
 def mfi(request):
     if request.headers['Content-Type'] == "application/json;charset=UTF-8":
         data = json.loads(request.body.decode('utf-8'))
+        strategy = data.get('strategy')
         username = data.get('username')
         backtest_id = data.get('backtest_id')
         stocks = data.get('stocks')
         startDate = data.get('startDate')
         endDate = data.get('endDate')
     else:
+        strategy = request.POST.get("strategy")
         username = request.POST.get("username")
         backtest_id = request.POST.get("backtest_id")
         stocks = request.POST.get("stocks")
@@ -323,11 +337,12 @@ def mfi(request):
         return HttpResponse(json.dumps({'code':'222'}))
 
     # 数据入backtest_records库
-    sql = 'INSERT INTO backtest_records (username,backtest_id,start_date,end_date,stocks) VALUES (%s,%s,%s,%s,%s)'
+    sql = 'INSERT INTO backtest_records (username,backtest_id,start_date,end_date,stocks,strtegy)' \
+          ' VALUES (%s,%s,%s,%s,%s,%s)'
     cursor.execute(sql, (username, backtest_id,
                          datetime.strptime(startDate, '%Y%m%d').strftime('%Y-%m-%d'),
                          datetime.strptime(endDate, '%Y%m%d').strftime('%Y-%m-%d')
-                         , ','.join(stocks)))
+                         , ','.join(stocks), strategy))
     db.commit()
 
     hold_result, trade_result, value_ratio, benchmark, indicator_list = MfiStrategy.run_mfi(stocks, startDate,
@@ -357,6 +372,7 @@ def mfi(request):
 def gru(request):
     if request.headers['Content-Type'] == "application/json;charset=UTF-8":
         data = json.loads(request.body.decode('utf-8'))
+        strategy = data.get('strategy')
         username = data.get('username')
         backtest_id = data.get('backtest_id')
         stocks = data.get('stocks')
@@ -367,6 +383,7 @@ def gru(request):
         rate = data.get('rate')
         stock_size = data.get('stock_size')
     else:
+        strategy = request.POST.get("strategy")
         username = request.POST.get("username")
         backtest_id = request.POST.get("backtest_id")
         stocks = request.POST.get("stocks")
@@ -395,11 +412,12 @@ def gru(request):
         return HttpResponse(json.dumps({'code':'222'}))
 
     # 数据入backtest_records库
-    sql = 'INSERT INTO backtest_records (username,backtest_id,start_date,end_date,stocks) VALUES (%s,%s,%s,%s,%s)'
+    sql = 'INSERT INTO backtest_records (username,backtest_id,start_date,end_date,stocks,strtegy)' \
+          ' VALUES (%s,%s,%s,%s,%s,%s)'
     cursor.execute(sql, (username, backtest_id,
                          datetime.strptime(startDate, '%Y%m%d').strftime('%Y-%m-%d'),
                          datetime.strptime(endDate, '%Y%m%d').strftime('%Y-%m-%d')
-                         , stocks))
+                         , ','.join(stocks), strategy))
     db.commit()
 
     hold_result, trade_result, value_ratio, benchmark, indicator_list = gruStrategy.run_gru_final(stocks, startDate,
@@ -429,6 +447,7 @@ def gru(request):
 def rnn(request):
     if request.headers['Content-Type'] == "application/json;charset=UTF-8":
         data = json.loads(request.body.decode('utf-8'))
+        strategy = data.get('strategy')
         username = data.get('username')
         backtest_id = data.get('backtest_id')
         stocks = data.get('stocks')
@@ -439,6 +458,7 @@ def rnn(request):
         rate = data.get('rate')
         stock_size = data.get('stock_size')
     else:
+        strategy = request.POST.get("strategy")
         username = request.POST.get("username")
         backtest_id = request.POST.get("backtest_id")
         stocks = request.POST.get("stocks")
@@ -467,11 +487,12 @@ def rnn(request):
         return HttpResponse(json.dumps({'code':'222'}))
 
     # 数据入backtest_records库
-    sql = 'INSERT INTO backtest_records (username,backtest_id,start_date,end_date,stocks) VALUES (%s,%s,%s,%s,%s)'
+    sql = 'INSERT INTO backtest_records (username,backtest_id,start_date,end_date,stocks,strtegy)' \
+          ' VALUES (%s,%s,%s,%s,%s,%s)'
     cursor.execute(sql, (username, backtest_id,
                          datetime.strptime(startDate, '%Y%m%d').strftime('%Y-%m-%d'),
                          datetime.strptime(endDate, '%Y%m%d').strftime('%Y-%m-%d')
-                         , stocks))
+                         , ','.join(stocks), strategy))
     db.commit()
 
     hold_result, trade_result, value_ratio, benchmark, indicator_list = rnnStrategy.run_rnn_final(stocks, startDate,
@@ -500,6 +521,7 @@ def rnn(request):
 def lstm(request):
     if request.headers['Content-Type'] == "application/json;charset=UTF-8":
         data = json.loads(request.body.decode('utf-8'))
+        strategy = data.get('strategy')
         username = data.get('username')
         backtest_id = data.get('backtest_id')
         stocks = data.get('stocks')
@@ -510,6 +532,7 @@ def lstm(request):
         rate = data.get('rate')
         stock_size = data.get('stock_size')
     else:
+        strategy = request.POST.get("strategy")
         username = request.POST.get("username")
         backtest_id = request.POST.get("backtest_id")
         stocks = request.POST.get("stocks")
@@ -537,11 +560,12 @@ def lstm(request):
         return HttpResponse(json.dumps({'code':'222'}))
 
     # 数据入backtest_records库
-    sql = 'INSERT INTO backtest_records (username,backtest_id,start_date,end_date,stocks) VALUES (%s,%s,%s,%s,%s)'
+    sql = 'INSERT INTO backtest_records (username,backtest_id,start_date,end_date,stocks,strtegy)' \
+          ' VALUES (%s,%s,%s,%s,%s,%s)'
     cursor.execute(sql, (username, backtest_id,
                          datetime.strptime(startDate, '%Y%m%d').strftime('%Y-%m-%d'),
                          datetime.strptime(endDate, '%Y%m%d').strftime('%Y-%m-%d')
-                         , stocks))
+                         , ','.join(stocks), strategy))
     db.commit()
 
     hold_result, trade_result, value_ratio, benchmark, indicator_list = lstmStrategy.run_lstm_final(stocks, startDate,
