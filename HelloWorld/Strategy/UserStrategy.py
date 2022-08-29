@@ -1,6 +1,4 @@
-<<<<<<< HEAD
-=======
-#hahhhahxixiix
+
 from . import util
 import backtrader as bt
 import pandas as pd
@@ -161,4 +159,3 @@ def run_user(ts_code_list=['000001.SZ','000002.SZ'],startdate='20220419',enddate
     # indicator_list:一号元素表示剩余持仓价值，二号元素表示策略收益,三号元素表示总复合收益,四号元素表示百分数表示年化收益率，五号元素表示最大回撤率，
     #六号元素表示最大回撤金，七号元素年化普比率
 
->>>>>>> 42cfed80ee6881f4533ef70d624b287c5b8f4bfe

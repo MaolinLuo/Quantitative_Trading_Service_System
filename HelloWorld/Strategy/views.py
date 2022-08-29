@@ -612,6 +612,23 @@ def uploadCode(request):
 
 
 @csrf_exempt
+def uploadMd(request):
+    # if request.headers['Content-Type'] == "application/json;charset=UTF-8":
+    #     data = json.loads(request.body.decode('utf-8'))
+    #     whichCode = data.get('whichCode')
+    # else:
+    #     whichCode = request.POST.get("whichCode")
+
+
+    filename = './Strategy/templateMd.md'
+    with open(filename,'r',errors='ignore',encoding='utf-8') as f:
+        Md=f.read()
+
+
+    return HttpResponse(json.dumps({'Md':Md}))
+
+
+@csrf_exempt
 def downloadCode(request):
     if request.headers['Content-Type'] == "application/json;charset=UTF-8":
         data = json.loads(request.body.decode('utf-8'))
@@ -636,7 +653,7 @@ def downloadCode(request):
         except:
             return HttpResponse(json.dumps({'code':'444'}))
         # 格式化，保留两位小数
-        value_ratio['ratio'] = value_ratio['ratio'].map(lambda x: x * 10000).apply(lambda x: format(x, '.2')).astype(float)
+        value_ratio['ratio'] = value_ratio['ratio'].map(lambda x: x * 100).apply(lambda x: format(x, '.2')).astype(float)
         value_ratio = value_ratio.to_json(orient='values')
 
         hold_result['price'] = hold_result['price'].apply(lambda x: format(x, '.2')).astype(float)
