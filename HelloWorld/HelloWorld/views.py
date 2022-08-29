@@ -53,7 +53,7 @@ def register(request):
     if results:
         return HttpResponse(json.dumps({'code':'222'})) # 用户名已存在
     else:
-        sql='INSERT INTO user (username,password,isAdmin) VALUES (%s,%s,0)'
+        sql='INSERT INTO user (username,password,userType) VALUES (%s,%s,0)'
         cursor.execute(sql,(name,password))
         db.commit()
         return HttpResponse(json.dumps({'code':'111'})) # 注册成功
