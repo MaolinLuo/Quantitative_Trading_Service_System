@@ -7,8 +7,8 @@ from django.views.decorators.csrf import csrf_exempt
 # 120.46.205.232  Quantitative_Trading_Service_System quantitative_trading_service_system
 db = pymysql.connect(host='localhost',
                      user='root',
-                     password='505505',
-                     database='test')
+                     password='123456',
+                     database='quantitative_trading_service_system')
 cursor = db.cursor()
 
 def hello(request):
@@ -31,7 +31,7 @@ def login(request):
     # print(results)
     if results:
         if results[0][1]==password:
-            return HttpResponse(json.dumps({'code':'111'})) # 登录成功
+            return HttpResponse(json.dumps({'code':'111','userType':results[0][2]})) # 登录成功
         else:
             return HttpResponse(json.dumps({'code':'222'})) # 密码不对
     else:
@@ -57,3 +57,16 @@ def register(request):
         cursor.execute(sql,(name,password))
         db.commit()
         return HttpResponse(json.dumps({'code':'111'})) # 注册成功
+
+@csrf_exempt
+def toVip(request):
+    if request.headers['Content-Type']=="application/json;charset=UTF-8":
+        data=json.loads(request.body.decode('utf-8'))
+        name=data.get('username')
+    else:
+        name = request.POST.get("username")
+    sql = 'UPDATE user SET userType=1 WHERE username = %s'
+    cursor.execute(sql, name)
+    # results = cursor.fetchall()
+    db.commit()
+    return HttpResponse(json.dumps({'code':"111"}))

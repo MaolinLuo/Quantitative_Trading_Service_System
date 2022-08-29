@@ -24,8 +24,8 @@ auth('13951687652', 'Syj020608!')
 
 db = pymysql.connect(host='localhost',
                      user='root',
-                     password='505505',
-                     database='test')
+                     password='123456',
+                     database='quantitative_trading_service_system')
 cursor = db.cursor()
 
 
@@ -39,7 +39,8 @@ def list(request):
     results = cursor.fetchall()
     res = []
     for item in results:
-        tmp = {'num': item[0], 'title': item[1], 'text': item[2], 'tag1': item[3], 'tag2': item[4], 'tag3': item[5]}
+        tmp = {'num': item[0], 'title': item[1], 'text': item[2], 'tag1': item[3], 'tag2': item[4],
+               'tag3': item[5],'tag4':item[6]}
         res.append(tmp)
     # db.close()
     return HttpResponse(json.dumps(res))
