@@ -68,7 +68,7 @@ export default {
             this.$store.commit('setnavshow',true)
             this.$store.commit('setuserType',res.userType);
             this.$store.commit("setusername", this.username);
-
+            localStorage.setItem("token",res.token)
             this.$router.push("/mainwindow");
              this.$message({
               showClose: true,
