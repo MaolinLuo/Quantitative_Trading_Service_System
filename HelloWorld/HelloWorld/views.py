@@ -1,8 +1,24 @@
 import json
-
 from django.http import HttpResponse
 import pymysql
 from django.views.decorators.csrf import csrf_exempt
+import hashlib
+import jwt
+import time
+
+# 生成一个字典，包含我们的具体信息
+d = {
+    # 公共声明
+    'exp': time.time() + 3000,  # (Expiration Time) 此token的过期时间的时间戳
+    'iat': time.time(),  # (Issued At) 指明此创建时间的时间戳
+    'iss': 'Issuer',  # (Issuer) 指明此token的签发者
+
+    # 私有声明
+    'data': {
+        'username': 'xjj',
+        'timestamp': time.time()
+    }
+}
 
 # 120.46.205.232  Quantitative_Trading_Service_System quantitative_trading_service_system
 db = pymysql.connect(host='localhost',
@@ -23,15 +39,16 @@ def login(request):
     else:
         name = request.POST.get("username")
         password = request.POST.get("password")
-    # print(name)
-    # print(password)
     sql = 'SELECT * FROM user WHERE username = %s'
     cursor.execute(sql, name)
     results = cursor.fetchall()
-    # print(results)
+    Encry = hashlib.md5()  # 实例化md5
+    Encry.update(password.encode())  # 字符串字节加密
+    pwd = Encry.hexdigest()  # 字符串加密
     if results:
-        if results[0][1]==password:
-            return HttpResponse(json.dumps({'code':'111','userType':results[0][2]})) # 登录成功
+        if results[0][1]==pwd:
+            token = jwt.encode(d, pwd, algorithm='HS256')
+            return HttpResponse(json.dumps({'code':'111','userType':results[0][2],'token':str(token)})) # 登录成功
         else:
             return HttpResponse(json.dumps({'code':'222'})) # 密码不对
     else:
@@ -54,7 +71,10 @@ def register(request):
         return HttpResponse(json.dumps({'code':'222'})) # 用户名已存在
     else:
         sql='INSERT INTO user (username,password,userType) VALUES (%s,%s,0)'
-        cursor.execute(sql,(name,password))
+        Encry = hashlib.md5()  # 实例化md5
+        Encry.update(password.encode())  # 字符串字节加密
+        md5_pwd = Encry.hexdigest()  # 字符串加密
+        cursor.execute(sql,(name,md5_pwd))
         db.commit()
         return HttpResponse(json.dumps({'code':'111'})) # 注册成功
 

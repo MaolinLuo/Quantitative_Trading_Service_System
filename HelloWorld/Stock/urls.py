@@ -9,4 +9,5 @@ urlpatterns = [
     path('realTableData/',views.realTableData),
     path('realBaseData/', views.realBaseData),
     path('companyinfo/', views.companyinfo),
+    path('allStocksCodes/', views.allStocksCodes),
 ]

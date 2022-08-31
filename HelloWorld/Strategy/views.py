@@ -43,6 +43,7 @@ def list(request):
                'tag3': item[5],'tag4':item[6]}
         res.append(tmp)
     # db.close()
+    # print(res)
     return HttpResponse(json.dumps(res))
 
 
@@ -758,3 +759,31 @@ def getSingleBacktestRecord(request):
     return HttpResponse(json.dumps(
         {'hold_result': hold_result, 'trade_result': trade_result, 'value_ratio': value_ratio, 'benchmark': benchmark,
          'indicator_list': indicator_list}))
+
+def deleteSingleBackTestRecord(request):
+    if request.headers['Content-Type'] == "application/json;charset=UTF-8":
+        data = json.loads(request.body.decode('utf-8'))
+        username = data.get('username')
+        backtest_id=data.get('backtest_id')
+    else:
+        username = request.GET.get("username")
+        backtest_id=request.GET.get("backtest_id")
+    sql = 'DELETE FROM backtest_records WHERE username = %s and backtest_id = %s'
+    cursor.execute(sql, (username, backtest_id))
+    db.commit()
+    sql = 'DELETE FROM benchmark WHERE username = %s and backtest_id = %s'
+    cursor.execute(sql, (username, backtest_id))
+    db.commit()
+    sql = 'DELETE FROM hold_result WHERE username = %s and backtest_id = %s'
+    cursor.execute(sql, (username, backtest_id))
+    db.commit()
+    sql = 'DELETE FROM indicator_list WHERE username = %s and backtest_id = %s'
+    cursor.execute(sql, (username, backtest_id))
+    db.commit()
+    sql = 'DELETE FROM value_ratio WHERE username = %s and backtest_id = %s'
+    cursor.execute(sql, (username, backtest_id))
+    db.commit()
+    sql = 'DELETE FROM trade_result WHERE username = %s and backtest_id = %s'
+    cursor.execute(sql, (username, backtest_id))
+    db.commit()
+    return HttpResponse(json.dumps({'code':'111'}))

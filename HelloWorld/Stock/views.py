@@ -4,6 +4,10 @@ from django.http import HttpResponse
 import datetime
 import akshare as ak
 from jqdatasdk import *
+# 导入tushare
+import tushare as ts
+# 初始化pro接口
+pro = ts.pro_api('0d43464d84c399737c36d0dc8a2b32a32be9a193e8203230668f66f2')
 
 auth('13951687652', 'Syj020608!')
 
@@ -147,3 +151,26 @@ def companyinfo(request):
     df = finance.run_query(q)
     # print(df)
     return HttpResponse(df.to_json(orient='records'))
+
+def formatStr(strr):
+    return strr.str.split('.',1)[0]
+
+def allStocksCodes(request):
+    # 拉取数据
+    df = pro.stock_basic(**{
+        "ts_code": "",
+        "name": "",
+        "exchange": "",
+        "market": "",
+        "is_hs": "",
+        "list_status": "",
+        "limit": "",
+        "offset": ""
+    }, fields=[
+        "ts_code",
+    ])
+    df.columns=['value']
+    for i in range(len(df)):
+        df.loc[i]['value']=df.loc[i]['value'].split(".",2)[0]
+    return HttpResponse(df.to_json(orient="records"))
+
