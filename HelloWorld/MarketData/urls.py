@@ -7,4 +7,5 @@ urlpatterns = [
     path('StockIndex/', views.StockIndex),
     path('MostPopular/', views.MostPopular),
     path('HistoryStockIndex/', views.HistoryStockIndex),
+    path('HistoryStockIndex2/', views.HistoryStockIndex2),
 ]

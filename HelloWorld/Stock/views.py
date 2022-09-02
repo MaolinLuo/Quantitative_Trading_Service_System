@@ -22,11 +22,15 @@ def kline(request):
     else:
         code = request.GET.get("code")
     # 判断有无该股票
-    ncode = normalize_code(code)  # 转成聚宽的代码
     try:
-        display_name = get_security_info(ncode).display_name
+        ncode = normalize_code(code)  # 转成聚宽的代码
     except:
-        return HttpResponse(json.dumps({'code':'222'}))
+        return HttpResponse(json.dumps({'code':'333'}))#聚宽接口出现问题
+
+    # try:
+    #     display_name = get_security_info(ncode).display_name
+    # except:
+    #     return HttpResponse(json.dumps({'code':'222'}))#没有该股票
     # 获取当天日期和两年前的日期
     today = datetime.date.today()
     ftoday = '20' + today.strftime('%y%m%d')
@@ -79,11 +83,11 @@ def realTableData(request):
     else:
         code = request.GET.get("code")
     # 判断有无该股票
-    ncode = normalize_code(code)  # 转成聚宽的代码
-    try:
-        display_name = get_security_info(ncode).display_name
-    except:
-        return HttpResponse(json.dumps({'code': '222'}))
+    # ncode = normalize_code(code)  # 转成聚宽的代码
+    # try:
+    #     display_name = get_security_info(ncode).display_name
+    # except:
+    #     return HttpResponse(json.dumps({'code': '222'}))
     df = ak.stock_zh_a_spot_em()
     df = df.loc[df['代码'] == code]
     df = df.loc[:, ('最新价', '今开', '涨跌额', '最高', '涨跌幅', '名称')]
@@ -121,11 +125,11 @@ def realBaseData(request):
     else:
         code = request.GET.get("code")
     # 判断有无该股票
-    ncode = normalize_code(code)  # 转成聚宽的代码
-    try:
-        display_name = get_security_info(ncode).display_name
-    except:
-        return HttpResponse(json.dumps({'code': '222'}))
+    # ncode = normalize_code(code)  # 转成聚宽的代码
+    # try:
+    #     display_name = get_security_info(ncode).display_name
+    # except:
+    #     return HttpResponse(json.dumps({'code': '222'}))
     df = ak.stock_zh_a_spot_em()
     df = df.loc[df['代码'] == code]
     df = df.loc[:, ('换手率', '成交量', '量比', '成交额', '流通市值', '总市值', '市盈率-动态', '涨速')]
@@ -142,11 +146,11 @@ def companyinfo(request):
     else:
         code = request.GET.get("code")
     # 判断有无该股票
-    ncode = normalize_code(code)  # 转成聚宽的代码
-    try:
-        display_name = get_security_info(ncode).display_name
-    except:
-        return HttpResponse(json.dumps({'code': '222'}))
+    # ncode = normalize_code(code)  # 转成聚宽的代码
+    # try:
+    #     display_name = get_security_info(ncode).display_name
+    # except:
+    #     return HttpResponse(json.dumps({'code': '222'}))
     q = query(finance.STK_COMPANY_INFO).filter(finance.STK_COMPANY_INFO.code == normalize_code(code)).limit(10)
     df = finance.run_query(q)
     # print(df)

@@ -1,9 +1,15 @@
 from django.http import HttpResponse
 import json
+import pymysql
 import akshare as ak
 import pandas as pd
 import datetime
 
+db = pymysql.connect(host='localhost',
+                     user='root',
+                     password='123456',
+                     database='quantitative_trading_service_system')
+cursor = db.cursor()
 
 def UDdistribution(request):
     stock_zh_a_spot_em_df = ak.stock_zh_a_spot_em()
@@ -48,7 +54,7 @@ def MostPopular(request):
     df = stock_hot_follow_xq_df.head(10)
     return HttpResponse(df.to_json()) # 关注度拉取成功
 
-def HistoryStockIndex(request):
+def HistoryStockIndex2(request):
     ISOTIMEFORMAT = '%Y%m%d'
     date_now = datetime.datetime.now().strftime(ISOTIMEFORMAT)
     index_zh_a_hist_df_sh = ak.index_zh_a_hist(symbol="000001", period="daily", start_date="20220101", end_date=date_now)
@@ -72,10 +78,36 @@ def HistoryStockIndex(request):
         sh.append(result.iat[i,1])
         sz.append(result.iat[i,2])
         cy.append(result.iat[i,3])
+        sql = 'INSERT INTO historystockindex (Date,sh,sz,cy) VALUES (%s,%s,%s,%s)'
+        cursor.execute(sql, (result.iat[i,0],result.iat[i,1],result.iat[i,2],result.iat[i,3]))
+        # results = cursor.fetchall()
+        db.commit()
         i += 1
     res.append(date)
     res.append(sh)
     res.append(sz)
     res.append(cy)
+    return HttpResponse(json.dumps(res, ensure_ascii=False))
 
+def HistoryStockIndex(request):
+    sql = 'SELECT * FROM historystockindex'
+    cursor.execute(sql)
+    results = cursor.fetchall()
+    # print(results)
+    res=[]
+    date=[]
+    sh=[]
+    sz=[]
+    cy=[]
+    i=0
+    for item in results:
+        date.append(results[i][0])
+        sh.append(results[i][1])
+        sz.append(results[i][2])
+        cy.append(results[i][3])
+        i+=1
+    res.append(date)
+    res.append(sh)
+    res.append(sz)
+    res.append(cy)
     return HttpResponse(json.dumps(res, ensure_ascii=False))
